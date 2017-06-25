@@ -17,7 +17,7 @@ for S in ./S*; do
 			f2=${f1%%_1.fastq}"_2.fastq"
 			# create variable f2  which is f1 with ending "_2.fastq"
 
-			java -jar ~/Programs/Trimmomatic-0.36/trimmomatic-0.36.jar \
+			java -jar ~/bin/trimmomatic/trimmomatic.jar \
 			PE -phred33 -trimlog \
 			${f1%%_1.fastq}.log \
 			$f1 \
@@ -27,7 +27,7 @@ for S in ./S*; do
 			${f1%%_1.fastq}_trimmed_RP.fastq \
 			${f1%%_1.fastq}_trimmed_RU.fastq \
 			LEADING:10 TRAILING:10 SLIDINGWINDOW:8:15 MINLEN:150 AVGQUAL:18 \
-			ILLUMINACLIP:/home/gvl/Programs/Trimmomatic-0.36/adapters/TruSeq3-PE.fa:2:10:3:1
+			ILLUMINACLIP:/home/gvl/bin/trimmomatic/adapters/TruSeq3-PE.fa:2:10:3:1
 			echo ------------------------------------------------
 		done
 
