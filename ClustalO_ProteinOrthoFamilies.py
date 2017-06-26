@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 
-
+############################################################################################
 def Open_ProteinFamily (ProteinFamily): # Takes argument ProteinFamily
 	NodeList = []
 	
@@ -12,8 +12,7 @@ def Open_ProteinFamily (ProteinFamily): # Takes argument ProteinFamily
 	#Return list
 	return (NodeList)
 
-
-
+############################################################################################
 def Collect_Node_Data (ListOfProteinFamily,ProteinDirectory):# Open folder of Proteomes takes argument ProteinFamilyList 
 	import os
 	
@@ -25,9 +24,7 @@ def Collect_Node_Data (ListOfProteinFamily,ProteinDirectory):# Open folder of Pr
 
 	#Move into ProteinDirectory.
 	StartDir= os.getcwd()
-	print (StartDir)
 	os.chdir(Path)
-	print ('after %s'%(os.getcwd()))
 	
 	#For each line in ProteinFamilylist:
 	for node in ListOfProteinFamily:
@@ -54,15 +51,28 @@ def Collect_Node_Data (ListOfProteinFamily,ProteinDirectory):# Open folder of Pr
 								
 							elif FeedTheList == True:
 								Dirstring+=l[:-1]
-	os.system('cd %s'%(StartDir))	
+	os.chdir(StartDir)	
 	return ORFDict
 
 ############################################################################################
 #Run each enty of multifasta in ClustalO
+def Run_ClustalO(OrfDictIn,ProteinFamily):
+	import os
+	
+	OrfDict = OrfDictIn
+	ProteinFamily = ProteinFamily.name
+	ProteinFamily = ProteinFamily.split('/')
+	FormattedFilename = ProteinFamily[-1:]
+
+	with open('tmp.faa','w+') as f:
+		for i in OrfDict:
+			f.write('%s\n'%(i.replace(' ','-')))
+			f.write('%s\n'%(OrfDict[i][0]))
+	execstring = 'clustalo -i %s --seqtype=Protein -o %s.aln.fasta -v --force --outfmt=clu'% ('tmp.faa',FormattedFilename[0])
+	os.system(execstring)
 
 
-
-
+############################################################################################
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-pf", dest="ProteinFamily", type=argparse.FileType('r'), required=True, help="Protein File, conatining NODES.. ")
@@ -77,13 +87,16 @@ ListOfNodes= Open_ProteinFamily(args.ProteinFamily)
 for i in ListOfNodes:
 	print (i)
 
-OrfDir = Collect_Node_Data(ListOfNodes,args.ProteinDirectory)
+OrfDict = Collect_Node_Data(ListOfNodes,args.ProteinDirectory)
 
-for i in OrfDir:
+for i in OrfDict:
 	print ('\n')
-	print (OrfDir[i][1])
+	print (OrfDict[i][1])
 	print (i)
-	print (OrfDir[i][0])
+	print (OrfDict[i][0])
+
+Run_ClustalO(OrfDict,args.ProteinFamily)
+
 
 
 
