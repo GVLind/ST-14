@@ -15,10 +15,9 @@ def make_formatted_file_from_list_and_outfmt(inlist,outfmt): # takes list and ma
 	
 	NewFileList = []
 	for fileline in inlist:
-		fileline=fileline.replace('\n','')
 		if fileline.startswith('>'):
 			fileline=fileline.replace(' ','_')
-			fileline = '\n>ref-%s_prot-%s\n'%(outfmt,fileline[1:])
+			fileline = '>ref-%s_prot-%s\n'%(outfmt,fileline[1:])
 			NewFileList.append(fileline)
 		else:
 
