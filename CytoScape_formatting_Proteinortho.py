@@ -30,12 +30,10 @@ def Format_project_proteinortho_to_Cytoscape_csv(ProteinOrthoProject):
 
 					if splitline[index]==('*'):
 												
-						newfile.write('\t')
+						newfile.write('\n')
 					else: 
 						newfile.write('%s\t'%( splitline[index]))
-					
-
-					newfile.write('%s\n'%(Firstline[index]))
+						newfile.write('%s\n'%(Firstline[index]))
 	newfile.close()
 
 
