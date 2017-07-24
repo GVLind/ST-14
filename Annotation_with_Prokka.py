@@ -155,7 +155,7 @@ def Run_Prokka(Path):
 			x=tmpname[1]+'_'+tmpname[3]
 
 			# Formats string for execution
-			execstring =  ('prokka --outdir %s --locustag %s --prefix %s --force ./%s'%(x,x,x,i))
+			execstring =  ('prokka --outdir %s --locustag %s --prefix %s --force --mincontiglen 200 --evalue 1e-08 ./%s'%(x,x,x,i))
 		
 			# Executes in terminal
 			os.system(execstring)	
