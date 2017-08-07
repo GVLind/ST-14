@@ -94,13 +94,18 @@ def format_spades_fastafiles (ScaffoldPaths,OutputPath):
 	outputpath = os.getcwd()
 	os.chdir(Cwd)
 
+
+
 	for Scaffolds in ScaffoldPaths:
+		print Scaffolds
 		
 		# Formats filename from path.
 		Filenamefmt = Scaffolds.split('-')
 		Filenamefmt = Filenamefmt[1]
 		Filenamefmt = Filenamefmt.split('_')
-		FileID = ('Strain_%s_Run_%s'%(Filenamefmt[1],Filenamefmt[0][0]))
+		FileID = ('Strain_%s_Run_%s'%(Filenamefmt[1],Filenamefmt[0]))
+
+		print FileID
 
 		#Opens inputfiles from paths and creates a new outputfile simulatneously.
 		with open(Scaffolds,'r') as inputfile, open ('%s/%s'%(OutputPath,FileID),'w') as outputfile:
@@ -232,7 +237,7 @@ path=format_spades_fastafiles (ScaffoldPaths, args.OutputDirectory)
 
 # 5
 # PATH from format_spades_fasta
-Run_Prokka (path)
+Run_Prokka(path)
 
 # 6
 collect_and_clean()
