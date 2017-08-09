@@ -27,6 +27,7 @@ with open (Dbfile,'r') as fi:
 		if line.startswith(">"):
 			line = line + "###"
 		tmpstring=tmpstring + line
+	tmpstring = tmpstring.replace(" ","")
 	tmpstring = tmpstring.replace("-","")
 	tmpstring = tmpstring.replace("(","")
 	tmpstring = tmpstring.replace(")","")
@@ -36,7 +37,7 @@ with open (Dbfile,'r') as fi:
 	tmpstring = tmpstring.replace("+","")
 	tmpstring = tmpstring.replace("\n","")
 	tmpstring =tmpstring.replace(">","\n>")
-	tmpstring =tmpstring.replace("###","\n>")
+
 fi.close()
 
 Dbfile = inputpath+"/NewDbfile.faa.tmp"
@@ -48,7 +49,7 @@ fo.close
 # creating dictionary containing proteinfamilies
 
 foldercontent = os.listdir(inputpath)
-proteinfamilies = {}
+proteinfamilies = []
 proteinfamilycounter = 0
 
 
@@ -58,41 +59,53 @@ for item in foldercontent:
 		with open("%s/myproject.proteinortho"%(inputpath),"r") as proteinorthoOut:
 
 			for line in proteinorthoOut:
+				proteinfamilyWnumber=[]
 				splitline=line.split('\t')
-				proteinfamily=splitline[3:-1]
-				proteinfamilycounter +=1
-				proteinfamilies.update({proteinfamilycounter:proteinfamily})
+				proteinfamily=splitline[3:]
 
+				proteinfamilycounter +=1
+				proteinfamilyWnumber.append("ProteinFamily_%s"%(proteinfamilycounter))
+				
+				for i in proteinfamily:
+					i = i.replace("\n","")
+
+					proteinfamilyWnumber.append(i)
+				proteinfamilies.append(proteinfamilyWnumber)
+
+
+				
+				
 proteinorthoOut.close()
 
+Dblines=[]
+with open (Dbfile,"r") as Db:
 
-# grabbing sequence data
+	for line in Db:
+		Dblines.append(line)
+Db.close()
 
-# Not working corectly, f-ing cal f-ing up my .txtoutputs
-with open(Dbfile,"r") as Database:
-	with open ("tmp.txt","w")as tmp:
+for ProteinFamily in proteinfamilies:
+	PFlist=[]
+	for protein in ProteinFamily[1:]:
+		
+		for line in Dblines:
 
-		#print proteinfamilies[12]
+			if line.startswith(">"+protein):
+				print "hit" + ProteinFamily[0]
+				print protein
+				print line
+				PFlist.append(line)
 
-		for key in proteinfamilies.keys():
-			
-			for val in proteinfamilies[key]:
-				
-				print val[:20]
-				for line in Database:
-					#print val[:15]
+		with open (inputpath+"/"+ProteinFamily[0],"w")as PF:
+			for i in PFlist:
+				i=i.replace("###","\n")
+				PF.write(i)
+		PF.close()
 
-					print line[1:20]
-					#print value
-					#tmp.write("%s %s"%(val,line))
-					#print val,line
-					if val[:3]==line[1:3]:
-						print line
-						print val
 
-tmp.close
-Database.close
+		
 
-#>S9_21_01729_Elongation_factor_Tu_2
-#S17_21_01615_Phosphoribosylformylglycinamidine_synthase
-#S17_21_01615_Ph
+
+
+
+
