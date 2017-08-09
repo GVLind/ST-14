@@ -200,9 +200,8 @@ def collect_and_clean():
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument("-i", dest="InputDirectory", required=True, help= "SPAdes output file location")
+parser.add_argument("-i", dest="InputDirectory", required=True, help= "SPAdes output file location, script takes finds scaffolds on its own")
 parser.add_argument("-o", dest="OutputDirectory", required=True, help= "Desired output directory")
-parser.add_argument("-c", dest="Cutoff", help="Integer for percent")
 args = parser.parse_args()
 parser.parse_args()
 
