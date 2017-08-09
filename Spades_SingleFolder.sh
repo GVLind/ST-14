@@ -9,8 +9,8 @@ for S in ./S*; do
 		do
 			notify-send "Start $f1"
 			f2=${f1%%_trimmed_FP.fastq}"_trimmed_RP.fastq"
-
-			/home/gvl/Programs/SPAdes-3.10.0-Linux/bin/spades.py \
+			#Changed due to export of SPAdes binaties to $PATH
+			spades.py \
 			--pe1-1 $f1 \
 			--pe1-2 $f2 \
 			-k 21,33,55,77 \
