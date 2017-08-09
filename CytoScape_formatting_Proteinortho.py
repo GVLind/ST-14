@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 # Formats output from proteinortho "myproject.proteinortho" to .csv tab delimited Proteifamily - gene - Strain
+
 def Format_project_proteinortho_to_Cytoscape_csv(ProteinOrthoProject):
 
 	import os
