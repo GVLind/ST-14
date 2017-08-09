@@ -29,7 +29,7 @@ def Find_Matches (filelist): # Takes List of files as input, preferrably from St
 			#Check if protein isn't present in all strains.
 			#if != number of strains --> Mismatch
 			#else --> Match
-			if len(line)-3 != int(line [0]):
+			if len(line)-3 != len(line [0]):
 
 				# Makes indicies 1,2,3 to int. for easier sorting.
 				int_str_line=[]
