@@ -152,20 +152,29 @@ for i in proteinfamilies[0][2:]:
 		i=i.replace("New","")
 		Reflist.append(i)
 
+#list all
+#MakeProteinfamilyFiles(proteinfamilies,"All",Dbfile,inputpath)
+
+#list all ST-14
+ST14Pangenome = []
+for i in proteinfamilies:
+	if (i[1][2])>0:
+		ST14Pangenome.append(i)
+MakeProteinfamilyFiles(ST14Pangenome,"ST14Pangenome",Dbfile,inputpath)
 
 #list containing reference
 ContainingReference=[]
 for i in proteinfamilies:
 	if (i[1][1])>0:
 		ContainingReference.append(i)
-MakeProteinfamilyFiles(ContainingReference,"Ref",Dbfile,inputpath)
+#MakeProteinfamilyFiles(ContainingReference,"Ref",Dbfile,inputpath)
 
 #list notcontaining reference
 NotContainingReference=[]
 for i in proteinfamilies:
 	if (i[1][1])==0:
 		NotContainingReference.append(i)
-MakeProteinfamilyFiles(NotContainingReference,"No_Ref",Dbfile,inputpath)
+#MakeProteinfamilyFiles(NotContainingReference,"No_Ref",Dbfile,inputpath)
 
 #further dividing families:
 #creating a list of where to find the reference strains.
@@ -199,4 +208,4 @@ for Referencelist in AppendedReflist:
 			if proteinfamily[0] == Reference:
 				Temporary_proteinfamily.append(proteinfamily)
 
-	MakeProteinfamilyFiles(Temporary_proteinfamily,Referencelist[0],Dbfile,inputpath)
+	#MakeProteinfamilyFiles(Temporary_proteinfamily,Referencelist[0],Dbfile,inputpath)
