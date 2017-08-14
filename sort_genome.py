@@ -19,12 +19,10 @@ def FormatNames (string):
 def MakeProteinfamilyFiles (PFlist,header, Dbfile,inputpath):
 	import subprocess
 
-	try:
-		subprocess.call(["mkdir","%s/%s"%(inputpath,header)])
+	subprocess.call(["mkdir","%s/%s"%(inputpath,header)])
+	print ("grepping amino acids for proteinfamilies belonging to %s"%(header))
 
-		#maybe some cool exception??
 
-	print ("grepping amino acids for proteinfamilies belonging to %s"%(header))	
 	for i in PFlist:
 		print ("%s/%s"%(i[0],len(PFlist)), end="\r")
 
@@ -155,20 +153,19 @@ for i in proteinfamilies[0][2:]:
 		Reflist.append(i)
 
 
-#lsit containing reference
+#list containing reference
 ContainingReference=[]
 for i in proteinfamilies:
 	if (i[1][1])>0:
 		ContainingReference.append(i)
-MakeProteinfamilyFiles(ContainingReference,"No_Ref",Dbfile,inputpath)
+MakeProteinfamilyFiles(ContainingReference,"Ref",Dbfile,inputpath)
 
 #list notcontaining reference
 NotContainingReference=[]
 for i in proteinfamilies:
 	if (i[1][1])==0:
-		#print (i)
 		NotContainingReference.append(i)
-MakeProteinfamilyFiles(ContainingReference,"Ref",Dbfile,inputpath)
+MakeProteinfamilyFiles(NotContainingReference,"No_Ref",Dbfile,inputpath)
 
 #further dividing families:
 #creating a list of where to find the reference strains.
