@@ -122,9 +122,52 @@ def get_settings (reffile):											# parse the settings or reference file.
 
 		return settingsOut									#returning the settingslist on the form 1: <,>,= for out, 2: % for out, 3: out , 4: strains(s) in out 5<,>,= for in, 6 % for in  7 , in. 
 
-def make_sorted_proteinfamily_dict(settings,pfam):
-	return settings
+def make_sorted_proteinfamily_dict(settings,pfam):					# makes two cases multiple strains or simple strain as outgroup
+	
+	for setting in settings:
+		
+		if type(setting[3])==str:
+			sort_pfam(setting,pfam)
 
+		elif type(setting[3]==list):
+			sort_pfam_multiple(setting,pfam)
+				
+				
+def sort_pfam (settings,pfam):										# takes single strain 
+	
+
+
+	for keys in pfam:
+		count_in 		= 0
+		count_in_hit 	= 0
+		count_out 		= 0
+		count_out_hit 	= 0
+		for elements in pfam[keys]:
+			if elements[0].find(settings[3])==-1:
+				count_in +=1
+				if elements[1]!="*":
+					count_in_hit+=1
+			if elements[0].find(settings[3])>-1:
+				count_out +=1
+				if elements[1]=="*":
+					count_out_hit+=1
+		percent_out=count_out_hit/count_out
+		percent_in=count_in_hit/count_in
+		print ("""
+		pfam:		%s
+		Outstrain:	%s
+		No in:		%s
+		No in hits:	%s
+		percent:	%s
+		No out:		%s
+		No out hits:	%s
+		percent:	%s  
+				"""%(keys,settings[3],count_in,count_in_hit,percent_in,count_out,count_out_hit,percent_out))
+
+
+
+def sort_pfam_multiple(settings,pfam):
+	print ("multiple..")
 
 #test make sorted proteinfamily_dict
 settings= get_settings("ref.txt")
