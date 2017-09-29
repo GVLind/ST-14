@@ -94,6 +94,8 @@ def set_outgroup (reffile):
 
 #test for set_ref
 
+#add testcomment
+
 reference = set_outgroup("ref.txt")
 
 print(reference)
