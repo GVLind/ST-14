@@ -16,7 +16,7 @@ def flatten_FASTA_strings(filename):	# open and read fasta-files return each all
 				line =line.replace("\n","\t",1)		# replacing first occurece of \n with \t, to be able to remove all \n later on
 			
 			line=line.replace("\n","")				# removing all \n, leaving the element of the list as just one line containing header + sequence delimited by tab
-			fasta_out.append(line)					# appending the formatted line to the output list. 
+			fasta_out.append(line)					# appending the formatted line to the output list.
 
 		return fasta_out 							
 
@@ -85,11 +85,22 @@ def make_csv_from_proteinfamily_dict(pfam_dict):	#makes a tab-delimited .csv fil
 			for value in pfam_dict[key][3:]:			#cut away first three list element in list of each dictionary .value()
 				csv_file.write((value[0] + "\t" + value[2])+"\n")
 				
+def set_outgroup (reffile):
+	with open (reffile,"r") as referencefile:			# opens reffile
+		return referencefile.read().split("\n")[:-1]	# returns a list of referneces.
 
 
 
+
+#test for set_ref
+
+reference = set_outgroup("ref.txt")
+
+print(reference)
+
+"""
 # working test for getsequence
-fmt_dict =get_sequence("myproject.proteinortho","All.faa")
+fmt_dict =get_sequence("testmyproject.txt","All.faa")
 
 for i in fmt_dict:
 	print(i)
@@ -97,7 +108,7 @@ for i in fmt_dict:
 		for k in j:
 			print(k)
 
-
+"""
 #test for make_csv_from_proteinfamily_dict
 
 #make_csv_from_proteinfamily_dict(get_sequence("testmyproject.txt","All.faa"))
