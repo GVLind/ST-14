@@ -127,13 +127,16 @@ def make_sorted_proteinfamily_dict(settings,pfam):					# makes two cases multipl
 	for setting in settings:
 		
 		if type(setting[3])==str:
-			sort_pfam(setting,pfam)
+			sort_pfam_evaluate_occurence(setting,pfam)
 
 		elif type(setting[3]==list):
 			sort_pfam_multiple(setting,pfam)
+
+def sort_pfam_multiple(settings,pfam):
+	
+	return				
 				
-				
-def sort_pfam (settings,pfam):										# takes single strain 
+def sort_pfam_evaluate_occurence (settings,pfam):					# evaluates the quota of hits / occurences of out our ingroup 
 	
 
 
@@ -142,6 +145,7 @@ def sort_pfam (settings,pfam):										# takes single strain
 		count_in_hit 	= 0
 		count_out 		= 0
 		count_out_hit 	= 0
+
 		for elements in pfam[keys]:
 			if elements[0].find(settings[3])==-1:
 				count_in +=1
@@ -151,23 +155,117 @@ def sort_pfam (settings,pfam):										# takes single strain
 				count_out +=1
 				if elements[1]=="*":
 					count_out_hit+=1
-		percent_out=count_out_hit/count_out
-		percent_in=count_in_hit/count_in
+		percent_out=100*count_out_hit/count_out
+		percent_in=100*count_in_hit/count_in
+
+		list_eval=[]
+		list_eval=(keys,settings,count_in_hit,count_in,percent_in,count_out_hit,count_out,percent_out,)
+
+									#passes evaluation data as a list. 
+		
+
 		print ("""
+		Settings: 	%s	
 		pfam:		%s
 		Outstrain:	%s
 		No in:		%s
 		No in hits:	%s
-		percent:	%s
+		percent in:	%s
 		No out:		%s
 		No out hits:	%s
-		percent:	%s  
-				"""%(keys,settings[3],count_in,count_in_hit,percent_in,count_out,count_out_hit,percent_out))
+		percent out:	%s 
+		status: 	%s
+				"""%(settings,
+					keys,
+					settings[3],
+					count_in,
+					count_in_hit,
+					percent_in,
+					count_out,
+					count_out_hit,
+					percent_out,
+					sort_pfam_compare_occurence_settings(list_eval)))
+
+
+def sort_pfam_compare_occurence_settings(evaluation_list):
+	
+	#Legend	-evaluation_list:	#Legend Settings:
+
+	#keys,			[0]			#Out operator	[0]
+	#settings,		[1]			#Out cutoff		[1]
+	#count_in_hit,	[2]			#Out 			[2]
+	#count_in,		[3]			#Out strain 	[3]
+	#percent_in,	[4]			#In operator 	[4]
+	#count_out_hit,	[5]			#In cutoff 		[5]
+	#count_out,		[6]			#In 			[6]
+	#percent_out,	[7]
+
+	pfam_status = False
+
+
+	#checking outgroup															#perccent out 				settings: out cutoff 				
+	if evaluation_list[1][0] == "=":
+
+		pfam_status = sort_pfam_comparedigits_equal_to(							int(evaluation_list[7]), 	int(evaluation_list[1][1]))
+
+	elif evaluation_list[1][0] == "<":
+
+		pfam_status = sort_pfam_comparedigits_less_than_and_equal_to(			int(evaluation_list[7]), 	int(evaluation_list[1][1]))
+
+	elif evaluation_list[1][0] == ">":		
+		pfam_status = sort_pfam_comparedigits_bigger_than_than_and_equal_to(	int(evaluation_list[7]), 	int(evaluation_list[1][1]))
 
 
 
-def sort_pfam_multiple(settings,pfam):
-	print ("multiple..")
+	#checking ingroup															#percent in 				settings: in cutoff 
+	if evaluation_list[1][4]  == "=" and pfam_status == True:
+		pfam_status = sort_pfam_comparedigits_equal_to(							int(evaluation_list[4]), 	int(evaluation_list[1][5]))
+
+	elif evaluation_list[1][4] == "<" and pfam_status == True:
+		pfam_status = sort_pfam_comparedigits_less_than_and_equal_to(			int(evaluation_list[4]), 	int(evaluation_list[1][5]))
+
+	elif evaluation_list[1][4] == ">" and pfam_status == True:
+		pfam_status = sort_pfam_comparedigits_bigger_than_than_and_equal_to(	int(evaluation_list[4]), 	int(evaluation_list[1][5]))
+
+	print(pfam_status)
+	return pfam_status
+def sort_pfam_comparedigits_equal_to(value1,value2):
+
+
+	pfam_status = False
+
+	if value1 == value2:	#checking if values match out cutoff and percent out
+		pfam_status = True
+
+		print(value1,"=",value2 , pfam_status)	#debug
+		return pfam_status
+	else:
+		print(value1,"=",value2 , pfam_status)	#debug
+		return pfam_status
+def sort_pfam_comparedigits_less_than_and_equal_to(value1,value2):
+
+
+	pfam_status = False
+	if value1 <= value2:	#checking if values match out cutoff and percent out
+		pfam_status = True
+
+		print(value1,"<",value2 , pfam_status)	#debug
+		return pfam_status
+	else:
+		print(value1,"<",value2 , pfam_status)	#debug
+		return pfam_status
+def sort_pfam_comparedigits_bigger_than_than_and_equal_to(value1,value2):
+
+
+	pfam_status = False
+	if value1 >= value2:	#checking if values match out cutoff and percent out
+		pfam_status = True
+
+		print(value1,">",value2 , pfam_status)	#debug
+		return pfam_status
+	else:
+		print(value1,">",value2 , pfam_status)	#debug
+		return pfam_status
 
 #test make sorted proteinfamily_dict
 settings= get_settings("ref.txt")
