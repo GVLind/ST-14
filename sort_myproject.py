@@ -1,54 +1,8 @@
 #!/usr/bin/python3
 
-def flatten_FASTA_strings(filename):					# open and read fasta-files return each all ORFs as a list, 1 ORF per line.
+def get_sequence(filename,filenameAllfasta):										# takes output from format_myprojectProteinortho_to_proteinfamily_dict and appends sequence from All.faa
 
-
-
-	with open (filename, 'r') as fasta_in:				# Opens fastafile as fasta_in
-		fastain=fasta_in.read().rstrip()				# Reads line by line		
-		fasta_out=[]									# declaring outfile
-
-		print(fastain)					#debug
-		fastain = fastain.split(">")[1:]				#split and remove first empty list element	
-
-														# for all found ORFs
-		for line in fastain:							# looping into list of lines
-			line =line.replace("\n","\t",1).replace("\n","")				# replacing first occurece of \n with \t, to be able to remove all \n later on
-			
-								# removing all \n, leaving the element of the list as just one line containing header + sequence delimited by tab
-			fasta_out.append(line)						# appending the formatted line to the output list.
-
-		return fasta_out 							
-
-def format_myprojectProteinortho_to_proteinfamily_dict (filename):	# open and format proteinortho output in a dictionary, keys = proteinfamily, value = formatted proteinortho output
-
-	with open (filename, 'r' ) as myproject_proteinorho:				# open specified input file
-
-		body 		=	myproject_proteinorho.read().split("\n")[:-1]	# body declared, splits at \n and removes last empty entry since each line in myproject.proteinorthoends with \n
-		header 		=  	body[0].split("\t")								# declaring header as the top row of the myproject.proteinortho
-		fmtfile		=	[]												# declaring variables x3
-		pf			=	{}
-		pf_count	=	1
-
-
-		for line in body[1:]:											# for each line in body except header, == row 0
-			line=line.split("\t")										# formatting lines to a list separated by splitting at \t. line length == header length
-			fmtfile = []												# declaring empty list as placeholder later in the creation of the dict.
-			for i in range(len(header)):								# loop for each entry in header which is exactly equal to line length, matching element in line to element in header
-
-				new_element= [header[i],line[i]]						# new element for dictionary consists of header element + line element
-				fmtfile.append(new_element)								# adding new element to placeholder.
-
-			pf["pfam:"+str(pf_count)]=fmtfile							# adding placeholder list to dictionary, formats counter to str for correct concatenation str + str
-			pf_count+=1
-
-		return pf														# returning dictionary wih .key() = pfam:x and .value() = hits of ortholog in each strain 
-
-																		#open and read myproject.proteinortho return dict of protein families
-
-def get_sequence(filename,filenameAllfasta):						# takes output from format_myprojectProteinortho_to_proteinfamily_dict and appends sequence from All.faa
-
-	
+	# might have problems here due to removal of first empty element in faltten_FASTA_Strings.
 	pfamdict = format_myprojectProteinortho_to_proteinfamily_dict(filename) # get dict fom function: format_myprojectProteinortho_to_proteinfamily_dict 
 	
 	# manually create an All.faa in the same dir as the myproject.proteinortho
@@ -77,7 +31,53 @@ def get_sequence(filename,filenameAllfasta):						# takes output from format_myp
      
 	return pfamdict						
 
-def make_csv_from_proteinfamily_dict(pfam_dict):					# makes a tab-delimited .csv file from dictionary with the format name=key.csv, content = value[0] \t value[2]
+def flatten_FASTA_strings(filename):												# open and read fasta-files return each all ORFs as a list, 1 ORF per line.
+
+
+
+	with open (filename, 'r') as fasta_in:				# Opens fastafile as fasta_in
+		fastain=fasta_in.read().rstrip()				# Reads line by line		
+		fasta_out=[]									# declaring outfile
+
+		print(fastain)					#debug
+		fastain = fastain.split(">")[1:]				#split and remove first empty list element	
+
+														# for all found ORFs
+		for line in fastain:							# looping into list of lines
+			line =line.replace("\n","\t",1).replace("\n","")				# replacing first occurece of \n with \t, to be able to remove all \n later on
+			
+														# removing all \n, leaving the element of the list as just one line containing header + sequence delimited by tab
+			fasta_out.append(line)						# appending the formatted line to the output list.
+
+		return fasta_out 							
+
+def format_myprojectProteinortho_to_proteinfamily_dict (filename):					# open and format proteinortho output in a dictionary, keys = proteinfamily, value = formatted proteinortho output
+
+	with open (filename, 'r' ) as myproject_proteinorho:				# open specified input file
+
+		body 		=	myproject_proteinorho.read().split("\n")[:-1]	# body declared, splits at \n and removes last empty entry since each line in myproject.proteinorthoends with \n
+		header 		=  	body[0].split("\t")								# declaring header as the top row of the myproject.proteinortho
+		fmtfile		=	[]												# declaring variables x3
+		pf			=	{}
+		pf_count	=	1
+
+
+		for line in body[1:]:											# for each line in body except header, == row 0
+			line=line.split("\t")										# formatting lines to a list separated by splitting at \t. line length == header length
+			fmtfile = []												# declaring empty list as placeholder later in the creation of the dict.
+			for i in range(len(header)):								# loop for each entry in header which is exactly equal to line length, matching element in line to element in header
+
+				new_element= [header[i],line[i]]						# new element for dictionary consists of header element + line element
+				fmtfile.append(new_element)								# adding new element to placeholder.
+
+			pf["pfam:"+str(pf_count)]=fmtfile							# adding placeholder list to dictionary, formats counter to str for correct concatenation str + str
+			pf_count+=1
+
+		return pf														# returning dictionary wih .key() = pfam:x and .value() = hits of ortholog in each strain 
+
+																		#open and read myproject.proteinortho return dict of protein families
+
+def make_csv_from_proteinfamily_dict(pfam_dict):									# makes a tab-delimited .csv file from dictionary with the format name=key.csv, content = value[0] \t value[2]
 
 
 	for key in pfam_dict:
@@ -85,7 +85,7 @@ def make_csv_from_proteinfamily_dict(pfam_dict):					# makes a tab-delimited .cs
 			for value in pfam_dict[key][3:]:							#cut away first three list element in list of each dictionary .value()
 				csv_file.write((value[0] + "\t" + value[2])+"\n")
 				
-def get_settings (reffile):												# parse the settings or reference file.
+def get_settings (reffile):															# parse the settings or reference file.
 	with open (reffile,"r") as referencefile:							# opens reffile
 		
 		outlist = []													# declaring local variables
@@ -123,78 +123,47 @@ def get_settings (reffile):												# parse the settings or reference file.
 
 		return settingsOut												#returning the settingslist on the form 1: <,>,= for out, 2: % for out, 3: out , 4: strains(s) in out 5<,>,= for in, 6 % for in  7 , in. 
 
-def make_sorted_proteinfamily_dict(settings,pfam):					# makes two cases multiple strains or simple strain as outgroup
-	
-	for setting in settings:
-		
-		if type(setting[3])==str:
-			stateofeval=sort_pfam_evaluate_occurence(setting,pfam)
-			
-			print("state of evaluate: ",stateofeval	)
-			
-		elif type(setting[3]==list):
-			sort_pfam_multiple(setting,pfam)
-
-def sort_pfam_multiple(settings,pfam):
-
-	
-
-	
-	return				
-
-				
-def sort_pfam_evaluate_occurence (settings,pfam):					# evaluates the quota of hits / occurences of out our ingroup 
-	
+def sort_pfam_comparedigits_equal_to(value1,value2):								# logical comparison == 
 
 
-	for keys in pfam:
-		count_in 	= 0
-		count_in_hit 	= 0
-		count_out 	= 0
-		count_out_hit 	= 0
+	pfam_status = False
 
-		for elements in pfam[keys]:
-			if elements[0].find(settings[3])==-1:
-				count_in +=1
-				if elements[1]!="*":
-					count_in_hit+=1
-			if elements[0].find(settings[3])>-1:
-				count_out +=1
-				if elements[1]=="*":
-					count_out_hit+=1
-		percent_out=100*count_out_hit/count_out
-		percent_in=100*count_in_hit/count_in
+	if value1 == value2:	#checking if values match out cutoff and percent out
+		pfam_status = True
 
-		list_eval=[]
-		list_eval=(keys,settings,count_in_hit,count_in,percent_in,count_out_hit,count_out,percent_out,)
-		status = sort_pfam_compare_occurence_settings(list_eval)
-									#passes evaluation data as a list. 
-		status_output.append[keys,status]		
+		#print(value1,"=",value2 , pfam_status)	#debug
+		return pfam_status
+	else:
+		#print(value1,"=",value2 , pfam_status)	#debug
+		return pfam_status						
 
-		print ("""
-		Settings: 	%s	
-		pfam:		%s
-		Outstrain:	%s
-		No in:		%s
-		No in hits:	%s
-		percent in:	%s
-		No out:		%s
-		No out hits:	%s
-		percent out:	%s 
-		status: 	%s
-				"""%(settings,
-					keys,
-					settings[3],
-					count_in,
-					count_in_hit,
-					percent_in,
-					count_out,
-					count_out_hit,
-					percent_out,
-					status	))
-	return status_output
+def sort_pfam_comparedigits_less_than_and_equal_to(value1,value2):					# logical comparison <=
 
-def sort_pfam_compare_occurence_settings(evaluation_list):
+
+	pfam_status = False
+	if value1 <= value2:	#checking if values match out cutoff and percent out
+		pfam_status = True
+
+		#print(value1,"<",value2 , pfam_status)	#debug
+		return pfam_status
+	else:
+		#print(value1,"<",value2 , pfam_status)	#debug
+		return pfam_status	
+
+def sort_pfam_comparedigits_bigger_than_than_and_equal_to(value1,value2):			# logical comparison >=
+
+
+	pfam_status = False
+	if value1 >= value2:	#checking if values match out cutoff and percent out
+		pfam_status = True
+
+		#print(value1,">",value2 , pfam_status)	#debug
+		return pfam_status
+	else:
+		#print(value1,">",value2 , pfam_status)	#debug
+		return pfam_status
+
+def sort_pfam_compare_occurence_settings(evaluation_list):							# takes composite list as argument, performs interpretation of settings data, passed for logical comparisons downstream
 	
 	#Legend	-evaluation_list:	#Legend Settings:
 
@@ -210,82 +179,182 @@ def sort_pfam_compare_occurence_settings(evaluation_list):
 	pfam_status = False
 
 
-	#checking outgroup								#perccent out 				settings: out cutoff 				
+	#checking outgroup															#calculated perccent out 	settings: out cutoff 				
+
+
+
+
+
 	if evaluation_list[1][0] == "=":
 
-		pfam_status = sort_pfam_comparedigits_equal_to(				int(evaluation_list[7]), 	int(evaluation_list[1][1]))
+		pfam_status = sort_pfam_comparedigits_equal_to(							int(evaluation_list[7]), 	int(evaluation_list[1][1]))
 
 	elif evaluation_list[1][0] == "<":
 
-		pfam_status = sort_pfam_comparedigits_less_than_and_equal_to(		int(evaluation_list[7]), 	int(evaluation_list[1][1]))
+		pfam_status = sort_pfam_comparedigits_less_than_and_equal_to(			int(evaluation_list[7]), 	int(evaluation_list[1][1]))
 
 	elif evaluation_list[1][0] == ">":		
 		pfam_status = sort_pfam_comparedigits_bigger_than_than_and_equal_to(	int(evaluation_list[7]), 	int(evaluation_list[1][1]))
 
 
 
-	#checking ingroup								#percent in 				settings: in cutoff 
+	#checking ingroup															#percent in 				settings: in cutoff 
 	if evaluation_list[1][4]  == "=" and pfam_status == True:
-		pfam_status = sort_pfam_comparedigits_equal_to(				int(evaluation_list[4]), 	int(evaluation_list[1][5]))
+		pfam_status = sort_pfam_comparedigits_equal_to(							int(evaluation_list[4]), 	int(evaluation_list[1][5]))
 
 	elif evaluation_list[1][4] == "<" and pfam_status == True:
-		pfam_status = sort_pfam_comparedigits_less_than_and_equal_to(		int(evaluation_list[4]), 	int(evaluation_list[1][5]))
+		pfam_status = sort_pfam_comparedigits_less_than_and_equal_to(			int(evaluation_list[4]), 	int(evaluation_list[1][5]))
 
 	elif evaluation_list[1][4] == ">" and pfam_status == True:
 		pfam_status = sort_pfam_comparedigits_bigger_than_than_and_equal_to(	int(evaluation_list[4]), 	int(evaluation_list[1][5]))
 
-	print(pfam_status)
+	#print(pfam_status)
 	return pfam_status
 
-def sort_pfam_comparedigits_equal_to(value1,value2):
+def sort_pfam_evaluate_if_proteinfamily_meets_criteria (settings,pfam):				# for each pfam key, data is generated from the value, this is passed together with the used settings as a composite list for comparison. 
+	
+	
+	status_output 	= []
+
+	for keys in pfam:
+													#for each key in dictionary the composite list is created and passed for comparison.
+		print("key %s evaluated"%(keys) )
+		count_in 		= 0
+		count_in_hit 	= 0
+		count_out 		= 0
+		count_out_hit 	= 0
+		
+
+		for elements in pfam[keys]:			# counts the number of hits and misses in myproject.proteinortho creates a unique composite list.
+			if elements[0].find(settings[3])==-1:
+				count_in +=1
+				if elements[1]!="*":
+					count_in_hit+=1
+			if elements[0].find(settings[3])>-1:
+				count_out +=1
+				if elements[1]=="*":
+					count_out_hit+=1
+					
+		percent_out=100*count_out_hit/count_out
+		percent_in=100*count_in_hit/count_in
+		CompositeList=[keys,settings,count_in_hit,count_in,percent_in,count_out_hit,count_out,percent_out] # Here the composite list is created 
+		
+  
+		status = sort_pfam_compare_occurence_settings(CompositeList)								# List is passed for comparison settings - calculated data
+		
+		status_output.append([keys,status])
+
+										
+	"""
+	can be unquoted for debugging don't forget #
+		print (#
+		Settings: 	%s	
+		pfam:		%s
+		Outstrain:	%s
+		No in:		%s
+		No in hits:	%s
+		percent in:	%s
+		No out:		%s
+		No out hits:	%s
+		percent out:	%s 
+		status: 	%s
+				%(settings,
+					keys,
+					settings[3],
+					count_in,
+					count_in_hit,
+					percent_in,
+					count_out,
+					count_out_hit,
+					percent_out,
+					status	))
+	"""
+	return status_output #passes evaluation data as a list. [Key, value=True or False.]
+	
+def sort_pfam_evaluate_if_proteinfamily_meets_criteria_multiple(settings,pfam):		# placeholder for later use
+
+	
+
+	
+	return				
+
+def make_dict_of_pfam_meeting_criteria(settings,inputAllPfams,ListOfEvaluatedPfams): # makes dict new dict of pfams meeting criteria, discards rest.
+
+	allPfams = inputAllPfams
+
+	pfamsMeetingCriteria ={}
 
 
-	pfam_status = False
+	#filter out pfam that is within the limits of the setting parameters:
+	#since numer of settings determine how many lists there will be there fore loop over range
 
-	if value1 == value2:	#checking if values match out cutoff and percent out
-		pfam_status = True
+	for i  in range(len(settings)):
+		currentSetting 	= settings[i]
+		evaluatedPfams	= ListOfEvaluatedPfams[i]
 
-		print(value1,"=",value2 , pfam_status)	#debug
-		return pfam_status
-	else:
-		print(value1,"=",value2 , pfam_status)	#debug
-		return pfam_status
-def sort_pfam_comparedigits_less_than_and_equal_to(value1,value2):
+		for evaluatedPfam in evaluatedPfams:
+			pfam = evaluatedPfam[0]
+			meetsCriteria = evaluatedPfam[1]
+					
+			if meetsCriteria == True:
+
+				pfamsMeetingCriteria[pfam] = allPfams[pfam]
+				print(currentSetting, evaluatedPfam, meetsCriteria)				
+			else:
+				print(currentSetting, evaluatedPfam, meetsCriteria)
+
+	return pfamsMeetingCriteria
+
+def make_sorted_proteinfamily_dict(settings,pfam):									# makes two cases multiple strains or simple strain as outgroup, makes calculations for each setting:
+	
+	outputPfamDictMeetingCriteria ={}
+	ListOfEvaluatedPfam =[]
+
+	for setting in settings:
+		print ("\nsetting evaluated:\n%s\n"%(setting))
+																										#settings list[] contains a list if it's multiple inputfiles, else a string is present.
+
+		if type(setting[3])==str:																		# if comparison with 1 refstrain
+			IdAndValue=sort_pfam_evaluate_if_proteinfamily_meets_criteria(setting,pfam)
+			
+			ListOfEvaluatedPfam.append(IdAndValue)
+
+		elif type(setting[3]==list):																	#if comparison multiple refstrains
+			sort_pfam_evaluate_if_proteinfamily_meets_criteria_multiple(setting,pfam)
+		
+	pfamsMeetingCriteria = make_dict_of_pfam_meeting_criteria(settings,pfam,ListOfEvaluatedPfam)		#pass data to make the output dictionary of
+
+	return pfamsMeetingCriteria
 
 
-	pfam_status = False
-	if value1 <= value2:	#checking if values match out cutoff and percent out
-		pfam_status = True
 
-		print(value1,"<",value2 , pfam_status)	#debug
-		return pfam_status
-	else:
-		print(value1,"<",value2 , pfam_status)	#debug
-		return pfam_status
-def sort_pfam_comparedigits_bigger_than_than_and_equal_to(value1,value2):
-
-
-	pfam_status = False
-	if value1 >= value2:	#checking if values match out cutoff and percent out
-		pfam_status = True
-
-		print(value1,">",value2 , pfam_status)	#debug
-		return pfam_status
-	else:
-		print(value1,">",value2 , pfam_status)	#debug
-		return pfam_status
-
-
-"""
 #test make sorted proteinfamily_dict
+
+# stuff to do:
+	# multiple ref-comparisons
+	# output.csv
+	# out output.csv in correct folder.
+
+
+
+
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
+
 settings= get_settings("ref.txt")
 pfams = format_myprojectProteinortho_to_proteinfamily_dict("testmyproject.txt")
-sorted_pfams = make_sorted_proteinfamily_dict(settings,pfams)
+pfamsMeetingCriteria = make_sorted_proteinfamily_dict(settings,pfams)
 
-print (sorted_pfams)
 
+pp.pprint(pfamsMeetingCriteria)
 
 """
+#test flatten_FASTA_strings
+line = (flatten_FASTA_strings("testfasta.fasta"))
+"""
+
+
 """
 #test for set_ref
 
@@ -311,9 +380,13 @@ for i in fmt_dict:
 """
 make_csv_from_proteinfamily_dict(get_sequence("testmyproject.txt","All.faa"))
 """
+
+"""
+#test flatten_FASTA_strings
 line = (flatten_FASTA_strings("testfasta.fasta"))
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 pp.pprint(line)
+"""
