@@ -40,7 +40,7 @@ def get_sequence(pfamdict,filenameAllfasta):										# takes output from format
 				for ORF in flatAll:
 
 					if ORF.count(pfam_list_element[1]) > 0:					# if ORF is found in list of proteins
-						pfam_list_element.append(ORF)
+						pfam_list_element.append(ORF.split("\t")[1])		# splitting orf at tab to just append the sequence.
 						flatAll.remove(ORF)
 
 
@@ -95,10 +95,12 @@ def make_csv_from_proteinfamily_dict(pfam_dict):									# makes a tab-delimited
 
 				if len(strainData) == 3:								#if len ==3 sequence data is present along with strain id and protein id 
 					strainSeq = strainData[2]
+					print (geneId)
 					csv_file.write("{0}\t{1}\t{2}\n".format(strainId,geneId,strainSeq))
 					
 
 				elif len(strainData) == 2:								# if len ==2 value is thought to contain strain id and proteinid
+					print(strainId, geneId)
 					csv_file.write("{0}\t{1}\n".format(strainId,geneId))
 			print ("file %s.csv created"%(filekey))
 
@@ -452,9 +454,6 @@ def make_sorted_proteinfamily_dict(settings,pfam):									# makes two cases mul
 	return pfamsMeetingCriteria
 
 
-
-#test make sorted proteinfamily_dict
-
 # stuff to do:
 	# multiple ref-comparisons
 	# out output.csv in correct folder.
@@ -463,59 +462,8 @@ def make_sorted_proteinfamily_dict(settings,pfam):									# makes two cases mul
 import sys
 
 settings= get_settings(sys.argv[1])
-
-#print (settings)
-
 pfams = format_myprojectProteinortho_to_proteinfamily_dict(sys.argv[2])
 pfamsMeetingCriteria = make_sorted_proteinfamily_dict(settings,pfams)
-print (pfamsMeetingCriteria)
-
-
-
-
 
 output_manager(pfams,pfamsMeetingCriteria,settings)
 
-
-
-"""
-#test flatten_FASTA_strings
-line = (flatten_FASTA_strings("testfasta.fasta"))
-"""
-
-
-"""
-#test for set_ref
-
-reference = get_settings("ref.txt")
-
-for i in reference:
-	print (i)
-"""
-
-"""
-# working test for getsequence
-fmt_dict =get_sequence("testmyproject.txt","All.faa")
-
-for i in fmt_dict:
-	print(i)
-	for j in fmt_dict[i][3:]:
-		for k in j:
-			print(k)
-
-"""
-#test for make_csv_from_proteinfamily_dict
-
-"""
-make_csv_from_proteinfamily_dict(get_sequence("testmyproject.txt","All.faa"))
-"""
-
-"""
-#test flatten_FASTA_strings
-line = (flatten_FASTA_strings("testfasta.fasta"))
-
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-
-pp.pprint(line)
-"""
