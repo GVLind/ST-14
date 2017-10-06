@@ -2,6 +2,7 @@
 ########################################################################################################################
 # managing output
 
+#working
 def flatten_FASTA_strings(filename):												# open and read fasta-files return each all ORFs as a list, 1 ORF per line.
 
 
@@ -21,6 +22,7 @@ def flatten_FASTA_strings(filename):												# open and read fasta-files retu
 
 		return fasta_out 							
 
+# Slow
 def get_sequence(pfamdict,filenameAllfasta):										# takes output from format_myprojectProteinortho_to_proteinfamily_dict and appends sequence from All.faa
 
 	
@@ -38,7 +40,7 @@ def get_sequence(pfamdict,filenameAllfasta):										# takes output from format
 				for ORF in flatAll:
 
 					if ORF.count(pfam_list_element[1]) > 0:					# if ORF is found in list of proteins
-						pfam_list_element.append(ORF)
+						pfam_list_element.append(ORF.split("\t")[1])		# splitting orf at tab to just append the sequence.
 						flatAll.remove(ORF)
 
 
@@ -51,6 +53,7 @@ def get_sequence(pfamdict,filenameAllfasta):										# takes output from format
      
 	return pfamdict						
 
+# working
 def format_myprojectProteinortho_to_proteinfamily_dict (filename):					# open and format proteinortho output in a dictionary, keys = proteinfamily, value = formatted proteinortho output
 
 	with open (filename, 'r' ) as myproject_proteinorho:				# open specified input file
@@ -77,6 +80,7 @@ def format_myprojectProteinortho_to_proteinfamily_dict (filename):					# open an
 
 																		#open and read myproject.proteinortho return dict of protein families
 
+# can't handle settings, needs to divide into folders based on settings
 def make_csv_from_proteinfamily_dict(pfam_dict):									# makes a tab-delimited .csv file from dictionary with the format name=key.csv, content = value[0] \t value[2]
 
 
@@ -98,6 +102,7 @@ def make_csv_from_proteinfamily_dict(pfam_dict):									# makes a tab-delimited
 					csv_file.write("{0}\t{1}\n".format(strainId,geneId))
 			print ("file %s.csv created"%(filekey))
 
+# working
 def prompt_interface():
 
 	print("\noutputmanager options: \n\n1 print to .csv files\n2 get sequences for hits\n3 print you sequences meeting criteria to the prompt\n4 print current settings to prompt\n0 exit\n")
@@ -105,6 +110,7 @@ def prompt_interface():
 	print("\n")
 	return userInput
 
+# working
 def output_manager(pfamDictIn,pfamDictOut,settings):
 	
 
@@ -141,6 +147,7 @@ def output_manager(pfamDictIn,pfamDictOut,settings):
 #########################################################################################################################
 # managing data
 
+# working
 def get_settings (reffile):															# parse the settings or reference file.
 
 	with open (reffile,"r") as referencefile:							# opens reffile
@@ -187,6 +194,65 @@ def get_settings (reffile):															# parse the settings or reference file
 
 		return settingsOut												#returning the settingslist on the form 1: <,>,= for out, 2: % for out, 3: out , 4: strains(s) in out 5<,>,= for in, 6 % for in  7 , in. 
 
+# working
+
+def check_if_all_True(trueList):
+	#checks if all strains meets criteria in pfam.
+	for i in trueList:
+		if i[1] == False:
+			return False
+		else:
+			return True
+
+def make_dict_of_pfam_meeting_criteria(settings,inputAllPfams,ListOfEvaluatedPfams): # makes dict new dict of pfams meeting criteria, discards rest.
+	# takes data from sort_pfam_evaluate_if_proteinfamily_meets_criteria(setting,pfam) for one single strain
+	# settings= get_settings(sys.argv[1])
+	# pfams = format_myprojectProteinortho_to_proteinfamily_dict(sys.argv[2])
+
+
+
+	#checking input parameters
+	if type(settings) != list:
+		print(" arg settings in function make_dict_of_pfam_meeting_criteria needs to be of type list, returning none")
+		return
+	elif type(inputAllPfams) != dict:
+		print(" arg inputAllPfams in function make_dict_of_pfam_meeting_criteria needs to be of type dict, returning none")
+		return
+	elif type(ListOfEvaluatedPfams) != list:
+		print(" arg ListOfEvaluatedPfams in function make_dict_of_pfam_meeting_criteria needs to be of type list, returning none")
+		return
+
+	for i in ListOfEvaluatedPfams:
+		if type(i[-1]) != str:
+			print("arg ListOfEvaluatedPfams in make_dict_of_pfam_meeting_criteria must be type sting, returning none")
+			return
+		
+
+
+	allPfams = inputAllPfams
+
+	pfamsMeetingCriteria ={}
+
+	for i in ListOfEvaluatedPfams:
+		print (i)
+
+	#filter out pfam that is within the limits of the setting parameters:
+	#since numer of settings determine how many lists there will be there fore loop over range
+
+	for i  in range(len(settings)):
+		currentSetting 	= settings[i]
+		evaluatedPfams	= ListOfEvaluatedPfams[i]
+
+		for evaluatedPfam in evaluatedPfams[:-1]:
+			pfam = evaluatedPfam[0]
+			pfamsMeetingCriteria[pfam] = allPfams[pfam]
+			pfamsMeetingCriteria[pfam].append(evaluatedPfams[-1])
+			
+
+
+	return pfamsMeetingCriteria
+
+# working
 def sort_pfam_comparedigits_equal_to(value1,value2):								# logical comparison == 
 
 
@@ -201,6 +267,7 @@ def sort_pfam_comparedigits_equal_to(value1,value2):								# logical comparison
 		#print(value1,"=",value2 , pfam_status)	#debug
 		return pfam_status						
 
+# working
 def sort_pfam_comparedigits_less_than_and_equal_to(value1,value2):					# logical comparison <=
 
 
@@ -214,6 +281,7 @@ def sort_pfam_comparedigits_less_than_and_equal_to(value1,value2):					# logical
 		#print(value1,"<",value2 , pfam_status)	#debug
 		return pfam_status	
 
+# working
 def sort_pfam_comparedigits_bigger_than_than_and_equal_to(value1,value2):			# logical comparison >=
 
 
@@ -227,8 +295,16 @@ def sort_pfam_comparedigits_bigger_than_than_and_equal_to(value1,value2):			# lo
 		#print(value1,">",value2 , pfam_status)	#debug
 		return pfam_status
 
+# working
 def sort_pfam_compare_occurence_settings(evaluation_list):							# takes composite list as argument, performs interpretation of settings data, passed for logical comparisons downstream
-	
+	#checking input parameters
+	if type(evaluation_list) != list or len(evaluation_list) != 8:
+		print ("evaluation_list faulty, needs to be type list and contain exactly 8 elements, returning none")
+		return
+	elif type(evaluation_list[1]) != list or len(evaluation_list[1]) != 7:
+		print ("settings element of composite list needs to be of type list and contain exactly 7 elements, returning none")
+		return
+
 	#Legend	-evaluation_list:	#Legend Settings:
 
 	#keys,			[0]			#Out operator	[0]
@@ -275,29 +351,87 @@ def sort_pfam_compare_occurence_settings(evaluation_list):							# takes composi
 	#print(pfam_status)
 	return pfam_status
 
+# working
+def format_setting_to_string (setting):
+	#takes one setting must be list
+
+	#checking parameters
+
+	if type(setting) != list:
+		print("arg setting format_setting_to_string type must be list, returning none")
+		return
+	if len(setting) != 7:
+		 print("arg setting format_setting_to_string type must have len 7, returning none")
+		 return
+
+	listToString=""
+	formattedSetting=""
+
+	#checks if element 3 is list and converts is to string
+	if len(setting[3])>1 and type(setting[3]) == list:
+		for i in setting[3]:
+			listToString +=(i+ " ")
+		setting[3]=listToString
+
+	#converts list to string element by element.
+	for i in setting:
+		formattedSetting+=(i+ " ")
+
+	return formattedSetting
+
+# working with single strains
 def sort_pfam_evaluate_if_proteinfamily_meets_criteria (settings,pfam):				# for each pfam key, data is generated from the value, this is passed together with the used settings as a composite list for comparison. 
+	# takes settings and pfam as argument,
+	# settings = get_settings(sys.argv[1])
+	# pfams = format_myprojectProteinortho_to_proteinfamily_dict(sys.argv[2])
+
+	#checking if element settings3 is string:
+	#if type(settings[3])!=str:
+	#	print ("function sort_pfam_evaluate_if_proteinfamily_meets_criteria neds type string settings list element 3...\n returning none")
+	#	return
 	
-	
+
 	status_output 	= []
 
 	for keys in pfam:
 													#for each key in dictionary the composite list is created and passed for comparison.
-		#print("key %s evaluated"%(keys) ) 			#debug
+		print("key %s evaluated"%(keys) ) 			#debug
 		count_in 		= 0
 		count_in_hit 	= 0
 		count_out 		= 0
 		count_out_hit 	= 0
-		
+		inList 	=[]
+		outList =[]
 
-		for elements in pfam[keys]:			# counts the number of hits and misses in myproject.proteinortho creates a unique composite list.
-			if elements[0].find(settings[3])==-1:
-				count_in +=1
-				if elements[1]!="*":
-					count_in_hit+=1
-			if elements[0].find(settings[3])>-1:
-				count_out +=1
-				if elements[1]=="*":
-					count_out_hit+=1
+		#for i in range(len(pfam[keys])):
+		#	print (pfam[keys][i])
+
+		#print(settings[3])
+
+		#starting from third element because parameters from proteinortho still left.
+		for elements in pfam[keys][3:]:			# counts the number of hits and misses in myproject.proteinortho creates a unique composite list.
+			#print (elements)
+
+			for i in settings[3]:
+				if i not in elements[0]:
+					if elements[0] not in inList:
+						inList.append(elements[0])
+
+				elif i in elements[0]:
+					outList.append(elements[0])
+
+
+		for i in inList:
+			#print(i," in")
+			count_in +=1
+			if elements[1]!="*":
+				count_in_hit+=1
+
+		for i in outList:
+			#print(i," out")
+			count_out +=1
+			if elements[1]=="*":
+				count_out_hit+=1
 					
 		percent_out=100*count_out_hit/count_out
 		percent_in=100*count_in_hit/count_in
@@ -305,14 +439,16 @@ def sort_pfam_evaluate_if_proteinfamily_meets_criteria (settings,pfam):				# for
 		
   
 		status = sort_pfam_compare_occurence_settings(CompositeList)								# List is passed for comparison settings - calculated data
+
+		if status == True:
 		
-		status_output.append([keys,status])
+			status_output.append([keys,status])
 
 										
-	"""
-	can be unquoted for debugging don't forget #
-		print (#
-		Settings: 	%s	
+	
+	#can be unquoted for debugging don't forget #
+		print ("""
+		Settings: 	%s
 		pfam:		%s
 		Outstrain:	%s
 		No in:		%s
@@ -322,7 +458,7 @@ def sort_pfam_evaluate_if_proteinfamily_meets_criteria (settings,pfam):				# for
 		No out hits:	%s
 		percent out:	%s 
 		status: 	%s
-				%(settings,
+				"""%(settings,
 					keys,
 					settings[3],
 					count_in,
@@ -332,130 +468,49 @@ def sort_pfam_evaluate_if_proteinfamily_meets_criteria (settings,pfam):				# for
 					count_out_hit,
 					percent_out,
 					status	))
-	"""
+	
 	return status_output #passes evaluation data as a list. [Key, value=True or False.]
-	
-def sort_pfam_evaluate_if_proteinfamily_meets_criteria_multiple(settings,pfam):		# placeholder for later use
-	print ("inside multiple")
-	
-
-	
-	return				
-
-def make_dict_of_pfam_meeting_criteria(settings,inputAllPfams,ListOfEvaluatedPfams): # makes dict new dict of pfams meeting criteria, discards rest.
-
-	allPfams = inputAllPfams
-
-	pfamsMeetingCriteria ={}
-
-
-	#filter out pfam that is within the limits of the setting parameters:
-	#since numer of settings determine how many lists there will be there fore loop over range
-
-	for i  in range(len(settings)):
-		currentSetting 	= settings[i]
-		evaluatedPfams	= ListOfEvaluatedPfams[i]
-
-		for evaluatedPfam in evaluatedPfams:
-			pfam = evaluatedPfam[0]
-			meetsCriteria = evaluatedPfam[1]
-					
-			if meetsCriteria == True:
-
-				pfamsMeetingCriteria[pfam] = allPfams[pfam]
-				#print(currentSetting, evaluatedPfam, meetsCriteria)		#debug				
-			else:
-				pass
-				#print(currentSetting, evaluatedPfam, meetsCriteria)		#debug
-
-	return pfamsMeetingCriteria
 
 def make_sorted_proteinfamily_dict(settings,pfam):									# makes two cases multiple strains or simple strain as outgroup, makes calculations for each setting:
-	
-	outputPfamDictMeetingCriteria ={}
+
+	#must handle multiple reference strains, if multiple check if all pfams are true, else discard.
+
 	ListOfEvaluatedPfam =[]
 
+	print (settings)
+	#one loop for each setting.
 	for setting in settings:
-		#print ("\nsetting evaluated:\n%s\n"%(setting))				#debug
-																										#settings list[] contains a list if it's multiple inputfiles, else a string is present.
 
-		if type(setting[3])==str:																		# if comparison with 1 refstrain
-			IdAndValue=sort_pfam_evaluate_if_proteinfamily_meets_criteria(setting,pfam)
-			
-			ListOfEvaluatedPfam.append(IdAndValue)
+		ListOfPfamAllTrue =[]
 
-		elif type(setting[3]==list):																	#if comparison multiple refstrains
-			sort_pfam_evaluate_if_proteinfamily_meets_criteria_multiple(setting,pfam)
-		
-	pfamsMeetingCriteria = make_dict_of_pfam_meeting_criteria(settings,pfam,ListOfEvaluatedPfam)		#pass data to make the output dictionary of
+			# sort away pfam that dont meet criteria 		
+		IdAndValue=sort_pfam_evaluate_if_proteinfamily_meets_criteria(setting,pfam)
+
+			# converts settings to string
+		settingString = format_setting_to_string(setting)
+			# appends settings to the end of the pfams
+		IdAndValue.append(settingString)	
+
+			#passing settings to list
+		ListOfEvaluatedPfam.append(IdAndValue)
+
+	print (ListOfEvaluatedPfam)
+	#sort_pfam_evaluate_if_proteinfamily_meets_criteria(setting,pfam) pass data to make the output dictionary of pfams that meet criteria
+	pfamsMeetingCriteria = make_dict_of_pfam_meeting_criteria(settings,pfam,ListOfEvaluatedPfam)		
 
 	return pfamsMeetingCriteria
 
-
-
-#test make sorted proteinfamily_dict
 
 # stuff to do:
 	# multiple ref-comparisons
-	# output.csv
 	# out output.csv in correct folder.
 
 
 import sys
 
 settings= get_settings(sys.argv[1])
-
-#print (settings)
-
 pfams = format_myprojectProteinortho_to_proteinfamily_dict(sys.argv[2])
 pfamsMeetingCriteria = make_sorted_proteinfamily_dict(settings,pfams)
 
+output_manager(pfams,pfamsMeetingCriteria,settings)
 
-
-
-
-#output_manager(pfams,pfamsMeetingCriteria,settings)
-
-
-
-"""
-#test flatten_FASTA_strings
-line = (flatten_FASTA_strings("testfasta.fasta"))
-"""
-
-
-"""
-#test for set_ref
-
-reference = get_settings("ref.txt")
-
-for i in reference:
-	print (i)
-"""
-
-"""
-# working test for getsequence
-fmt_dict =get_sequence("testmyproject.txt","All.faa")
-
-for i in fmt_dict:
-	print(i)
-	for j in fmt_dict[i][3:]:
-		for k in j:
-			print(k)
-
-"""
-#test for make_csv_from_proteinfamily_dict
-
-"""
-make_csv_from_proteinfamily_dict(get_sequence("testmyproject.txt","All.faa"))
-"""
-
-"""
-#test flatten_FASTA_strings
-line = (flatten_FASTA_strings("testfasta.fasta"))
-
-import pprint
-pp = pprint.PrettyPrinter(indent=4)
-
-pp.pprint(line)
-"""
