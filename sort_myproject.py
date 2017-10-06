@@ -133,11 +133,29 @@ def get_settings (reffile):															# parse the settings or reference file
 # working
 def check_if_all_True(trueList):
 	#checks if all strains meets criteria in pfam.
+	print ("truelist",trueList)
+	#print ("truelist element 1",trueList[1])
+	
 	for i in trueList:
-		if i[1] == False:
-			return False
-		else:
-			return True
+		if type(i) != list:
+			print ("truelist not list")
+			return False 
+			
+	if trueList == None:
+		return None
+	elif all(element[1] == True for element in trueList):
+		return True
+
+	if trueList[0] == True:
+		return True
+	else:
+		return False
+	
+	if trueList[0][1] == True:
+		return True
+	else:
+		return False
+	return False
 def make_dict_of_pfam_meeting_criteria(settings,inputAllPfams,ListOfEvaluatedPfams): # makes dict new dict of pfams meeting criteria, discards rest.
 	# takes data from sort_pfam_evaluate_if_proteinfamily_meets_criteria(setting,pfam) for one single strain
 	# settings= get_settings(sys.argv[1])
@@ -162,7 +180,11 @@ def make_dict_of_pfam_meeting_criteria(settings,inputAllPfams,ListOfEvaluatedPfa
 		#print (i)	#debug
 	#filter out pfam that is within the limits of the setting parameters:
 	#since numer of settings determine how many lists there will be there fore loop over range
-	for i  in range(len(settings)):
+	
+	for i in ListOfEvaluatedPfams:
+		print (i)
+
+	for i  in range(len(ListOfEvaluatedPfams)):
 		currentSetting 	= settings[i]
 		evaluatedPfams	= ListOfEvaluatedPfams[i]
 		for evaluatedPfam in evaluatedPfams[:-1]:
@@ -278,8 +300,12 @@ def sort_pfam_evaluate_if_proteinfamily_meets_criteria (settings,pfam):				# for
 				if i not in elements[0]:
 					if elements[0] not in inList:
 						inList.append(elements[0])
+
 				elif i in elements[0]:
-					outList.append(elements[0])
+					
+					if elements[0] not in outList:
+						outList.append(elements[0])
+
 		#counts hits and total number of strains in out and inlist, makes calculations.
 		for i in inList:			
 			count_in +=1
@@ -294,11 +320,12 @@ def sort_pfam_evaluate_if_proteinfamily_meets_criteria (settings,pfam):				# for
 		CompositeList=[keys,settings,count_in_hit,count_in,percent_in,count_out_hit,count_out,percent_out] # Here the composite list is created 		 
 		status = sort_pfam_compare_occurence_settings(CompositeList)								# List is passed for comparison settings - calculated data			
 		#can be unquoted for debugging don't forget #
-		#print ("""\nSettings:\t%s\npfam:\t%s\nOutstrain:\t%s\nNo in:\t%s\nNo in hits:\t%s\npercent in:\t%s\nNo out:\t%s\nNo out hits:\t%s\npercent out:\t%s\nstatus:\t%s
+		print ("""\nSettings:\t%s\npfam:\t%s\nOutstrain:\t%s\nNo in:\t%s\nNo in hits:\t%s\npercent in:\t%s\nNo out:\t%s\nNo out hits:\t%s\npercent out:\t%s\nstatus:\t%s
 		#"""%(settings,keys,settings[3],count_in,count_in_hit,percent_in,count_out,count_out_hit,percent_out,status))
-	#filters away all false hits
-		if status == True:
-			status_output.append([keys,status])
+	
+	
+		status_output.append([keys,status])
+
 
 	return status_output #passes evaluation data as a list. [Key, value=True or False.]
 def make_sorted_proteinfamily_dict(settings,pfam):									# makes two cases multiple strains or simple strain as outgroup, makes calculations for each setting:
@@ -316,6 +343,16 @@ def make_sorted_proteinfamily_dict(settings,pfam):									# makes two cases mul
 			# sort away pfam that dont meet criteria 		
 		IdAndValue=sort_pfam_evaluate_if_proteinfamily_meets_criteria(setting,pfam)
 
+			#filters away all false hits
+
+		if check_if_all_True(IdAndValue):
+			for i in IdAndValue:
+				print ("all",i,setting)
+		
+
+		#if check_if_all_True(IdAndValue):
+		#	for i in IdAndValue:
+		#		print ("True",i,setting)
 			# converts settings to string
 		settingString = format_setting_to_string(setting)
 			# appends settings to the end of the pfams
@@ -329,15 +366,52 @@ def make_sorted_proteinfamily_dict(settings,pfam):									# makes two cases mul
 	pfamsMeetingCriteria = make_dict_of_pfam_meeting_criteria(settings,pfam,ListOfEvaluatedPfam)		
 	return pfamsMeetingCriteria
 def input_output():
+
 	import sys
 	settings= get_settings(sys.argv[1])
 	pfams = format_myprojectProteinortho_to_proteinfamily_dict(sys.argv[2])
 	pfamsMeetingCriteria = make_sorted_proteinfamily_dict(settings,pfams)
 	output_manager(pfams,pfamsMeetingCriteria,settings)
 
+def unit_test_check_if_allTrue():
+	testlist=[]
+	testlist.append([["x1",True],["x2",False],["x3",True]])
+	testlist.append([["y1",True],["y2",True],["y3",True]])
+	testlist.append([["z1",False],["z2",False],["z3",False]])
+	testlist.append([["a",True]])
+	testlist.append(["b",False])
+	testlist.append([])
 
-input_output()
+	referencelist = [False,True,False,True,False,None]
+	outputlist =[]
+	for i in testlist:
+		print (i)
+
+	for i in testlist:
+		print (i)
+		print (check_if_all_True(i))
+		outputlist.append(check_if_all_True(i))
+	if referencelist==outputlist:
+		return True
+	else:
+		return False
+
+def unit_tester():
+	print ("starting unittester..")
+
+	print ("checking function check_if_all_True")
+	if unit_test_check_if_allTrue():
+		print ("ok")
+	else: 
+		print("unit_test_check_if_allTrue faild miserably")
+
+
+unit_tester()
+#input_output()
 # stuff to do:
 	# out output.csv in correct folder.
 	# make output with corresponding settings
 	# debug
+
+# Split further into functions
+# Settings: Json Jaml
