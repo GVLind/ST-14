@@ -134,13 +134,15 @@ def choose_drops(rawInputCsv):
     # interprets user input and returns a list of strains to be dropped
     columns = list(rawInputCsv.columns.values)
     ok = "n"
-    
+    dropList=[]
     while 1:    
         
         for i in range(len(columns)):
             print (i, columns[i])
         outString = input("any drops? delimited with , :")
         
+        if len(outString) == 0:
+            return dropList
         dropList = make_list_of_int_from_string(outString,columns)
         
         
@@ -158,11 +160,11 @@ def choose_drops(rawInputCsv):
     
 def drop_pfam(df,dropList):
     #drops columns from df based on input list
-    print("inside drop_pfam")
-    print(dropList)
-    df.drop(dropList, axis=1, inplace=True)
-    return df
-
+    
+     #print("inside drop_pfam")
+     print(dropList)
+     df.drop(dropList, axis=1, inplace=True)
+     return df
 
 
 def print_out(df,fileName="output"):
@@ -188,9 +190,15 @@ def get_seq(df,allfasta="All.faa"):
     for i in dfGenes:
         
         if i != "*":
-            rec=record_dict[i]
-            print(rec.name,"\t",rec.seq)
-            seqs.append(str(rec.seq))
+            try:
+                rec=record_dict[i]
+               # print(rec.name,"\t",rec.seq)
+                seqs.append(str(rec.seq))
+            except KeyError:
+                print ("KeyError, key not found in All.faa, printed as seq")
+                seqs.append("KeyError, key not found in All.faa")
+                
+
         else:
             seqs.append("")
     
@@ -252,7 +260,12 @@ def inputmanager():
     
     indexedCsv = set_index_name(inputCsv)
     
-    prunedCsv = drop_pfam(indexedCsv,choose_drops(indexedCsv))
+    dropList = choose_drops(indexedCsv)
+    
+    if len(dropList)==0:
+        prunedCsv = indexedCsv
+    else:
+        prunedCsv = drop_pfam(indexedCsv,dropList)
     
     listOutGroup = choose_outgroup(prunedCsv) #     ["PittEE","KR494"]
         
@@ -264,7 +277,7 @@ def inputmanager():
 
 def outputmanager(df):
     #handles output functions.
-    ans = input("grap sequences? (y?) : " )    
+    ans = input("grab sequences? (y?) : " )    
     listFormattedDf= format_df(df)
     
     
