@@ -55,7 +55,7 @@ def convert_to_numerical(df):
 
 def drop_rows_not_meeting_criteria(df,cutOff):
     #dropping rows not meeting criteria specified by set_reference
-    df = df[df["qIn"] > cutOff]
+    df = df[df["qIn"] > 0.95]
     df = df[df["qOut"] < (1-cutOff)]
     return df
 
@@ -64,12 +64,12 @@ def quota_row_full_csv(df,outGroup):
     headers = list(df.columns.values)
     inGroup = [x for x in headers if x not in outGroup]
 
-    
+    dfN = (df!="*").astype(int)
     #calculates all values and sum of elements of each row of ingroup and outgroup
-    inHits  = (df[inGroup].sum(axis=1))
-    inTot   = (df[inGroup].count(axis=1))
-    outHits = (df[outGroup].sum(axis=1))
-    outTot  = (df[outGroup].count(axis=1))
+    inHits  = (dfN[inGroup].sum(axis=1))
+    inTot   = (dfN[inGroup].count(axis=1))
+    outHits = (dfN[outGroup].sum(axis=1))
+    outTot  = (dfN[outGroup].count(axis=1))
     
     #adds quota to end of dataframe
     df['qIn'] = (inHits/inTot)
@@ -217,15 +217,16 @@ def data_manipulations(cutOff,listOutGroup,InputCsv,verbosity=0):
     
     #convert to numerical
     numericalInputCsv=convert_to_numerical(InputCsv)
+    print (numericalInputCsv)
     
     #get stats of each row ie pfam
-    statsCsv = quota_row_full_csv(numericalInputCsv,listOutGroup)
-    
+    statsCsv = quota_row_full_csv(InputCsv,listOutGroup)
+    print (statsCsv)
     # evaluates if meeting criteria drop other rowa
     MeetingCriteriaCsv = drop_rows_not_meeting_criteria(statsCsv,cutOff)
     
     # using original names
-    pfamMeetingCriteria = get_gene_names(MeetingCriteriaCsv,InputCsv)
+    #pfamMeetingCriteria = get_gene_names(MeetingCriteriaCsv,InputCsv)
 
     # output verbosity    
     if verbosity ==1:
@@ -242,11 +243,13 @@ def data_manipulations(cutOff,listOutGroup,InputCsv,verbosity=0):
         print("\n-----------expressed as original genes")
         print(pfamMeetingCriteria)
         
-    return pfamMeetingCriteria
+    return MeetingCriteriaCsv
 
-def inputmanager():
+def inputmanager(inputFile='myproject.proteinortho'):
     # gluing together functions that manages the iunput
-    rawInputCsv = open_proteinortho_output('myproject.proteinortho')
+    
+
+    rawInputCsv = open_proteinortho_output(inputFile)
     
     inputCsv = drop_unncessary_info(rawInputCsv)
     
@@ -264,7 +267,7 @@ def inputmanager():
 
 def outputmanager(df):
     #handles output functions.
-    ans = input("grap sequences? (y?) : " )    
+    ans = input("grab sequences? (y?) : " )    
     listFormattedDf= format_df(df)
     
     
@@ -276,8 +279,9 @@ def outputmanager(df):
             print_out(dfSeq,fileName)
     
     return
-    
-df = inputmanager()
+
+import sys
+df = inputmanager(sys.argv[1])
 outputmanager(df)
 
 
