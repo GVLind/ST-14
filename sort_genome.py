@@ -1,18 +1,18 @@
-#!/usr/bin/python
+#!/usr/bin/python333
 
 def FormatNames (string):
 
-	tmpstring = string.replace(" ","")
-	tmpstring = tmpstring.replace("(","")
-	tmpstring = tmpstring.replace(")","")
-	tmpstring = tmpstring.replace("/","")
-	tmpstring = tmpstring.replace("[","")
-	tmpstring = tmpstring.replace("]","")
-	tmpstring = tmpstring.replace("+","")
-	tmpstring = tmpstring.replace("\'","")
-	tmpstring = tmpstring.replace("\"","")
-	tmpstring = tmpstring.replace("\n","")
-	outstring =tmpstring.replace(">","\n>")
+	tmpstring = string.replace  ( " " , "" )
+	tmpstring = tmpstring.replace ("(","")
+	tmpstring = tmpstring.replace (")","")
+	tmpstring = tmpstring.replace ("/","")
+	tmpstring = tmpstring.replace ("[","")
+	tmpstring = tmpstring.replace ("]","")
+	tmpstring = tmpstring.replace ("+","")
+	tmpstring = tmpstring.replace ("\'","")
+	tmpstring = tmpstring.replace ("\"","")
+	tmpstring = tmpstring.replace ("\n","")
+	outstring =tmpstring.replace (">","\n>")
 
 	return outstring
 
@@ -33,7 +33,6 @@ def MakeProteinfamilyFiles (PFlist,header, Dbfile,inputpath):
 				p1 = subprocess.Popen(["grep","%s"%(j),"%s"%(Dbfile)],stdout=subprocess.PIPE)
 				proteinfamilyfile = open("%s/%s/%s%s"%(inputpath,header,i[0],meta),"a")
 				p2 = subprocess.Popen(["sed","s/###/\\n/g"],stdin = p1.stdout,stdout = proteinfamilyfile)
-				
 				proteinfamilyfile.close()
 				p1.stdout.close()
 	print ("%s files written to %s"%(len(PFlist),header))
@@ -84,7 +83,7 @@ proteinfamilycounter = 0
 
 for item in foldercontent:
 	if item == "myproject.proteinortho":
-		
+
 		with open("%s/myproject.proteinortho"%(inputpath),"r") as proteinorthoOut:
 
 			for line in proteinorthoOut:
@@ -102,9 +101,9 @@ for item in foldercontent:
 				proteinfamily=newsplitline[3:]
 
 
-				
+
 				proteinfamilyWnumber.append("ProteinFamily_%s"%(proteinfamilycounter))
-				
+
 				proteinfamilycounter +=1
 
 				for i in proteinfamily:
@@ -191,7 +190,7 @@ for List in proteinfamilies:
 		#print ("------------------")
 		for Reference in Reflist:
 			if Reference in Strains:
-				
+
 				for Refindex in AppendedReflist:
 
 					if Refindex[0] ==Reference:
@@ -204,7 +203,7 @@ for Referencelist in AppendedReflist:
 	for Reference in Referencelist:
 		#print (Reference[1:])
 		for proteinfamily in proteinfamilies:
-			
+
 			if proteinfamily[0] == Reference:
 				Temporary_proteinfamily.append(proteinfamily)
 
