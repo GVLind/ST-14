@@ -6,13 +6,11 @@ def open_proteinortho_output(myproject_fasta):
 		or opens it with fixed names if it ends with .csv 
 		Returns: dataframe
 	"""
-    file = myproject_fasta
+    
     import pandas as pd
     
-    if file.endswith(".csv"):
-        df = pd.read_csv(file,sep="\t",names = ["strain","gene","seq"])
-    else:
-        df = pd.read_csv(file,sep="\t")
+  
+    df = pd.read_csv(myproject_fasta,sep="\t",names = ["strain","gene","seq"])
     
     return df
 
@@ -30,7 +28,7 @@ def format_df(df):
         formattedFrames.append(dfC)
     return formattedFrames
 
-def print_out(df,fileName="output"):
+def print_out(df,fileName="output.txt"):
     
     # prints df with fileName to .csv handles earlies .csv separately to get correct naming
     if fileName.endswith(".csv"):
@@ -38,12 +36,9 @@ def print_out(df,fileName="output"):
     else:
         fileName +=".csv" 
     
-    try:
-    	
-    	df.to_csv(fileName, encoding='utf-8',sep="\t")
-    	print ("printed to %s.."%(fileName))
-    except:
-    	print("could not print to %s"%(fileName))
+    df.to_csv(fileName, encoding='utf-8',sep="\t")
+    print ("printed to %s.."%(fileName))
+
     return fileName
 
 
@@ -51,11 +46,9 @@ def get_seq(df,allfasta="All.faa"):
     
     #gets sequence from All.fasta, based on the column of genes, handles misses and hits, not multiple hits.
     from Bio import SeqIO
-    try:
-    	record_dict = SeqIO.to_dict(SeqIO.parse(allfasta, "fasta"))
-    except:
-    	print("function get_seq in out.py: BioPython Could not read from %s"%allfasta)
-
+    
+    record_dict = SeqIO.to_dict(SeqIO.parse(allfasta, "fasta"))
+    
     dfGenes = df["gene"].tolist()
     seqs=[]
     for i in dfGenes:
@@ -81,15 +74,17 @@ def get_seq(df,allfasta="All.faa"):
 
 def outputmanager(df):
     #handles output functions.
-    ans = input("grab sequences? (y?) : " )    
-    listFormattedDf= format_df(df)
+    ans = input("grab sequences? (y/e) : " )
     
-    
-    for i in listFormattedDf:
-        fileName = print_out(i,i.name)
-        df = open_proteinortho_output(fileName)
-        if ans == "y":
-            dfSeq = get_seq(df)
-            print_out(dfSeq,fileName)
-    
-    return
+    if ans != "e":
+
+        listFormattedDf= format_df(df)
+        
+        
+        for i in listFormattedDf:
+            print (i)
+            fileName = print_out(i,i.name)
+            df = open_proteinortho_output(fileName)
+            if ans == "y":
+                dfSeq = get_seq(df)
+                print_out(dfSeq,fileName)
