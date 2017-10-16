@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Oct  6 14:39:14 2017
 
-@author: gvl
-"""
 
 def drop_unncessary_info(DataFrame,columns = ['# Species', 'Genes', "Alg.-Conn."]):
-    #dropping unnecessary columns.
-    DataFrame.drop(columns, inplace=True, axis=1)
-    return DataFrame
+	"""	Argument: DataFrame
+		Purpose: Drops columns '# Species', 'Genes', "Alg.-Conn."
+		Output: DataFrame
+	""" 
+
+	DataFrame.drop(columns, inplace=True, axis=1)
+	return DataFrame
 
     
 def open_proteinortho_output(myproject_fasta):    
-    #open tab delimited csv file.
+    """	Argument: filename
+		Purpose: convert [filename] to either a plain dataframe,
+		or opens it with fixed names if it ends with .csv 
+		Returns: dataframe
+	"""
     file = myproject_fasta
     import pandas as pd
     
@@ -24,34 +27,29 @@ def open_proteinortho_output(myproject_fasta):
     
     return df
 
-def set_index_name(df):
-    # set index names as pfam + index
+def set_index_name(df,index="pfam"):
+    """	Argument: DataFrame
+		Purpose: set specific index
+		Returns: indexed dataframe
+	"""
     import pandas as pd
     indexList = list(df.index)
     newIndex=[]
     for i in indexList:
-        newIndex.append("pfam%s"%(i+1))
+        newIndex.append("%s%s"%(index,i+1))
     I = pd.Index(newIndex)
     
     indexed_df=df.set_index(I)
     
     return indexed_df
 
-def set_reference():
-    #set reference
-    cutOff=0.95
-    
-    return cutOff
-    
 def set_in_out_group(listOut):
-    #set outgroup
+    """	Argument:
+		Output:
+		Returns:
+	"""
     listOutGroup = ["PittEE","KR494"]
     return listOutGroup
-    
-def convert_to_numerical(df):
-    #converts hits to numerical value 1 and misses 0
-    dfN = (df!="*").astype(int)
-    return dfN
 
 def drop_rows_not_meeting_criteria(df,cutOff):
     #dropping rows not meeting criteria specified by set_reference
@@ -60,7 +58,10 @@ def drop_rows_not_meeting_criteria(df,cutOff):
     return df
 
 def quota_row_full_csv(df,outGroup):
-    #defines ingroup based on outgropup
+    """	Argument:
+		Output:
+		Returns:
+	"""
     headers = list(df.columns.values)
     inGroup = [x for x in headers if x not in outGroup]
 
@@ -72,35 +73,31 @@ def quota_row_full_csv(df,outGroup):
     outTot  = (dfN[outGroup].count(axis=1))
     
     #adds quota to end of dataframe
+    df['hitsIn'] = inHits
     df['qIn'] = (inHits/inTot)
+    df['hitsOut'] = outHits
     df['qOut'] = (outHits/outTot)
 
-
     return df
-def get_gene_names(df,dfRaw):
-    
-    rows = list(df.index)
-  
-    dfOut = dfRaw.loc[rows]
-
-    return dfOut
-    
-
-
 
 def make_list_of_int_from_string(outString,coulmns):
     
-    #makes a list of an inputstring delimited by ","
+    """	Argument: outString,coulmns
+		Purpose: make a list from a "," delimited string and return a list of 
+		corresponding elements in columns
+		Returns: list of selected columns
+	"""
     outString=outString.split(",")
     outInt =[]
     outList = []
-       
-    for i in range(len(outString)):
-        outInt.append(int(outString[i]))
+    try:   
+        for i in range(len(outString)):
+            outInt.append(int(outString[i]))
 
-    for i in outInt:
-        outList.append(coulmns[i])
-    
+        for i in outInt:
+            outList.append(coulmns[i])
+    except:
+        None
     return outList
 
 def choose_outgroup(rawInputCsv):
@@ -113,7 +110,7 @@ def choose_outgroup(rawInputCsv):
         
         for i in range(len(coulmns)):
             print (i, coulmns[i])
-        outString = input("please declare you outgroup, delimited with , :")
+        outString = input("\nOutgroup? delimit , :")
         
         outList = make_list_of_int_from_string(outString,coulmns)
         
@@ -121,13 +118,20 @@ def choose_outgroup(rawInputCsv):
         for i in outList:
             print (i)
             
-        ok = input("is this correct(y/n), exit for exiting..")
+        ok = input("\nCorrect? (y/n/e): ")
         
         if ok == "y":
             return outList
         
-        elif ok == "exit":
+        elif ok == "e":
             raise SystemExit
+
+
+def drop_pfam(df,dropList):
+    #drops columns from df based on input list
+    
+    df.drop(dropList, axis=1, inplace=True)
+    return df
 
 def choose_drops(rawInputCsv):
     
@@ -136,32 +140,26 @@ def choose_drops(rawInputCsv):
     ok = "n"
     
     while 1:    
-        
+        print("\n")
         for i in range(len(columns)):
             print (i, columns[i])
-        outString = input("any drops? delimited with , :")
+        outString = input("\nDrops? delimit , : ")
         
         dropList = make_list_of_int_from_string(outString,columns)
         
-        
+       
         for i in dropList:
             print (i)
             
-        ok = input("is this correct(y/n), exit for exiting..")
+        ok = input("\nCorrect? (y/n/e): ")
         
         if ok == "y":
-            print ("droplist",dropList )
+            print ("\ndropped",dropList,"\n" )
             return dropList
         
-        elif ok == "exit":
+        elif ok == "e":
             raise SystemExit
     
-def drop_pfam(df,dropList):
-    #drops columns from df based on input list
-    print("inside drop_pfam")
-    print(dropList)
-    df.drop(dropList, axis=1, inplace=True)
-    return df
 
 
 
@@ -213,20 +211,40 @@ def format_df(df):
         formattedFrames.append(dfC)
     return formattedFrames
 
+def graph(df,cutoff):
+    import matplotlib.pyplot as plt
+    import numpy as np
+    #rng = np.random.RandomState(10)  # deterministic random data
+
+
+    fig, axes = plt.subplots(nrows=3)
+    fig.subplots_adjust(hspace=0.4)
+    ax0, ax1, ax2= axes.flatten()
+
+    
+    ax0.hist(df["hitsIn"], bins=35,color="darkgreen")  # arguments are passed to np.histogram
+    ax0.set_title("Histogram of gene distribution of Out-group")
+   
+    
+    ax1.hist(df["hitsOut"], bins=10,color="teal")  # arguments are passed to np.histogram
+    ax1.set_title("Histogram of gene distribution of out-group")
+    
+
+    hb = ax2.hexbin(x=df['hitsIn'], y=df['hitsOut'],bins='log',gridsize=30,cmap="YlGn")
+    cb = fig.colorbar(hb)
+    cb.set_label('log10(N)')
+    plt.show()
+    
+
+
 def data_manipulations(cutOff,listOutGroup,InputCsv,verbosity=0):
-    
-    #convert to numerical
-    numericalInputCsv=convert_to_numerical(InputCsv)
-    print (numericalInputCsv)
-    
-    #get stats of each row ie pfam
+
     statsCsv = quota_row_full_csv(InputCsv,listOutGroup)
+
     print (statsCsv)
+    graph(statsCsv,cutOff)
     # evaluates if meeting criteria drop other rowa
     MeetingCriteriaCsv = drop_rows_not_meeting_criteria(statsCsv,cutOff)
-    
-    # using original names
-    #pfamMeetingCriteria = get_gene_names(MeetingCriteriaCsv,InputCsv)
 
     # output verbosity    
     if verbosity ==1:
@@ -259,7 +277,7 @@ def inputmanager(inputFile='myproject.proteinortho'):
     
     listOutGroup = choose_outgroup(prunedCsv) #     ["PittEE","KR494"]
         
-    cutOff = set_reference()
+    cutOff = 0.95
     
     df=data_manipulations(cutOff,listOutGroup,indexedCsv,verbosity = 0)
     
