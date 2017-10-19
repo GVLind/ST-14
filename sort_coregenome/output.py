@@ -73,7 +73,9 @@ def make_dir(outputdirname):
     """ making file if not already present
     """
     if not os.path.exists(outputdirname):
+
         os.makedirs(outputdirname)
+
     return
 
 def print_out(df, fileName = "output.txt"):
@@ -84,33 +86,60 @@ def print_out(df, fileName = "output.txt"):
     
     df.to_csv(fileName, encoding = 'utf-8', sep = "\t")
 
-    
-
     return fileName
 
-def write_and_grab_files(fileName,df,grab=False):
+def write_and_grab_files(Path,df,grab=False):
+    """ writes file using print_out function
+        for arguments: Path is expected to contain path ./Foldername/
+        df is expected to be a pandas DataFrame
+        grab is expected to be boolean.
 
-    # write and grab file flag
-
+        two cases:
+        1 for each line in dataframe:print file containing
+        only protein names and strains.
+        2. relies on 1, only executed if garab == True due to lack of
+        programming knowledge first the a df i opened from the file from 1
+        just printed, then the sequence is found using get_seq
+        finally new file with appended sequence overwrites the old one.
+    """
     listFormattedDf= format_df(df)
 
+    # just stranin and gene
     for pfam in listFormattedDf:
-        filePath = fileName + pfam.name
+        filePath = Path + pfam.name
         printedFile = print_out(pfam, filePath)
         print ("printed to %s.." % (filePath))        
 
-        # grab file flag
+        # grab file flag strain, gene and seq
         if grab == True:
             openDF = open_proteinortho_output(printedFile)
             dfSeq = get_seq(openDF)
-            filePath = fileName + pfam.name
+            filePath = Path + pfam.name
             print_out(dfSeq,filePath)
             print ("appended with seq %s.." % (filePath))
     return
 
 
 def outputmanager(df,cutOff):
-    #handles output functions.
+    """handles output functions.
+        df is expected to be a pandas dataframe
+        cutOff either a list containing cutoff for out group and in group
+        or a list of the abouve cutoffs.
+        ans can take one of four states:
+        -e exit
+        -w write only strain and gene to folder based on cutoff
+        -g grabs sequence and performs the same task as -w
+        - everything else: causes a crash
+
+        1. first the function checks if cutoff is list or list of lists
+        2. filenames are generated. either single or multiple.
+        3. for each filename a file is created using the filename from 2
+        5. path is created from filename from 2
+        4. based on user input files are printed to to the path of the new
+           folder
+    """
+
+
     print ("%s families meeting criteria\n" % (df.shape[0]))
 
     ans = input("Initializing output manager..\n write pfam to file? -w:\n grab sequencesans and write pfam to file? -g\n exit? -e \n: " )
@@ -124,43 +153,50 @@ def outputmanager(df,cutOff):
 
         # case for making filenames from different kinds of settings
         # one cutoff setting
-        if  type(cutOff[0]) != list:
+
+        #if  type(cutOff[0]) != list:
+
+        
             #making single folder name
-            outFileName = "In_%s_Out_%s"%(cutOff[0],cutOff[1])
-            make_dir(outFileName)
-            path="./%s/"%(outFileName)
+        outFileName = "In_%s_Out_%s" % (cutOff[0],cutOff[1])
+        make_dir(outFileName)
+        path = "./%s/" % (outFileName)
 
-            if ans =="g":
+        if ans =="g":
 
-                write_and_grab_files(path,df,True)
+            write_and_grab_files(path,df,True)
 
-            elif ans == "w":
+        elif ans == "w":
 
-                write_and_grab_files(path,df,False)
+            write_and_grab_files(path,df,False)
+"""
 
+not sure is need this if i pass one setting at the time from
+sort_refactored.
         # multiple cutoff settings.
         elif  type(cutOff[0]) == list:
 
             #making a list of foldernames   
-            outFileNames = ["In_%s_Out_%s"%(x[0],x[1]) for x in setting]
+            outFileNames = ["In_%s_Out_%s" % (x[0],x[1]) for x in setting]
+            
             # making file.
             for outFileName in outFileNames:
                 make_dir(outFileName)
-                path="./%s/"%(outFileName)
+                path = "./%s/" % (outFileName)
 
             # checks what mode is selected and
             # looping through all created filenames:
-                if ans == "w" and ans =="g":
+                if ans == "g":
 
                     write_and_grab_files(path,df,True)
 
-                elif ans == "w" and not ans =="g":
+                elif ans == "w":
 
                     write_and_grab_files(path,df,False)
 
         else:
             print ("something went wrong with the settings..")
             raise SystemExit
-
+"""
 
 

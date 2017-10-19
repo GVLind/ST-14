@@ -27,16 +27,23 @@ def drop_rows_not_meeting_criteria(df,cutOff):
     cutIn = cutOff[0]
     cutOut = cutOff[1]
 
+    print (cutIn, cutOut)
+
+    print("1")
     if cutIn == 1:
         df = df[df["qIn"] == cutIn]
+        print("2")
     else:
         df = df[df["qIn"] > cutIn]
+        print("3")
 
     if cutOut == 0:
         df = df[df["qOut"] == cutOut]
+        print("4")
     else:
         df = df[df["qOut"] < cutOut]
-        
+        print("5")
+
     return df
 
 def quota_row_full_csv(df, outGroup):

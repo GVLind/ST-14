@@ -132,7 +132,7 @@ def set_cutoff(cutIn = 0.95,cutOut =0.5):
             print ("\ninput must be integer\n")
             rule = []
 
-        if len(rule) == 2 and rule[0]<101 and rule[1] <101 :
+        if len(rule) == 2 and rule[0] < 101 and rule[1] < 101 :
 
             try:
 
