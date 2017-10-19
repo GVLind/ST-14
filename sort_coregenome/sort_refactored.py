@@ -9,8 +9,8 @@ import sort_data_manipulation as data
 
 cutOff,inputCsv,listOutGroup,verbosity = sort_ui.inputmanager(sys.argv[1])
 OutDf,statsCsv=data.data_manipulations(cutOff,inputCsv,listOutGroup,verbosity)
-output.outputmanager(OutDf)
+output.outputmanager(OutDf,cutOff)
 
-graphics.graph(statsCsv,cutOff)
+graphics.graph(statsCsv)
 
 

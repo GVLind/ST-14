@@ -1,6 +1,0 @@
-# Species	Genes	Alg.-Conn.	NewS15_11.faa	NewS1_11.faa	PittEE	KR494
-3	3	3	S15gene1	S11gene1	PittEEgene1	*
-3	2	2	S15gene2	S11gene2	*	kr494gene2
-3	2	2	S15gene3	S11gene2	*	*
-3	2	2	S15gene4	S11gene4	PittEEgene4	kr494gene4
-3	2	2	S15gene5	S11gene5	*	*

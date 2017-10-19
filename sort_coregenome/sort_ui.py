@@ -2,7 +2,7 @@
 
 
 
-def open_proteinortho_output(myproject_fasta):    
+def open_proteinortho_output(myproject_fasta):
     """	Argument: filename
 		Purpose: convert [filename] to either a plain dataframe,
 		or opens it with fixed names if it ends with .csv 
@@ -18,16 +18,16 @@ def open_proteinortho_output(myproject_fasta):
     
     return df
 
-
+    print (df)
 def drop_unncessary_info(DataFrame,columns = ['# Species', 'Genes', "Alg.-Conn."]):
-	"""	Argument: DataFrame
-		Purpose: Drops columns '# Species', 'Genes', "Alg.-Conn."
-		Output: DataFrame
-	""" 
-
-	DataFrame.drop(columns, inplace=True, axis=1)
-	return DataFrame
-
+    """	Argument: DataFrame
+    Purpose: Drops columns '# Species', 'Genes', "Alg.-Conn."
+    Output: DataFrame
+    """
+    print ("before Drop\n", DataFrame)
+    DataFrame.drop(columns, inplace=True, axis=1)
+    print("after drop\n ", DataFrame)
+    return DataFrame
 
 def make_list_of_int_from_string(outString,coulmns):
     
@@ -116,9 +116,41 @@ def drop_pfam(df,dropList):
      df.drop(dropList, axis=1, inplace=True)
      return df
 
+def set_cutoff(cutIn = 0.95,cutOut =0.5):
+    """ lets the user state the cutoffs return standard settings if
+        exit.
+    """
+    statement = ""
+    while statement != "e":
+
+        statement = input ("""state cutoff 0-100 for in and out-put\ndelim space, exit e\n:  """)
+
+        try:
+            rule = [int(x) for x in (statement.split())] 
+
+        except:
+            print ("\ninput must be integer\n")
+            rule = []
+
+        if len(rule) == 2 and rule[0]<101 and rule[1] <101 :
+
+            try:
+
+                cutIn = rule[0]/100
+                cutOut = rule[1]/100
+
+                return [cutIn,cutOut]
+
+            except:
+
+                print("\nError gict two number between 0-100\n")
+        else:
+         print ("\nwrong format\n") 
+
 def inputmanager(inputFile='myproject.proteinortho'):
-    # gluing together functions that manages the iunput
-    
+    """ gluing together functions that manages the iunput
+        could probably be managed with argsparse.
+    """
     rawInputCsv = open_proteinortho_output(inputFile)
     inputCsv = drop_unncessary_info(rawInputCsv)
     #here
@@ -131,12 +163,14 @@ def inputmanager(inputFile='myproject.proteinortho'):
         prunedCsv = inputCsv
     else:
         prunedCsv = drop_pfam(inputCsv,dropList)
+    
+
     # outgroup defined
     listOutGroup = choose_outgroup(prunedCsv)
     
         
-    cutOff = 0.95
-    verbosity = 0
+    cutOff = set_cutoff()
+    verbosity = 1
 
 
     return cutOff,prunedCsv,listOutGroup,verbosity
