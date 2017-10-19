@@ -20,11 +20,23 @@ def set_index_name(df,index="pfam"):
     return indexed_df
 
 def drop_rows_not_meeting_criteria(df,cutOff):
-    #dropping rows not meeting criteria specified by set_cutoff in sort_ui module.
+    """ dropping rows not meeting criteria specified by
+        set_cutoff in sort_ui module.
+        handling if == 100 for in and if == 0 for out
+    """
     cutIn = cutOff[0]
     cutOut = cutOff[1]
-    df = df[df["qIn"] > cutIn]
-    df = df[df["qOut"] < cutOut ]
+
+    if cutIn == 1:
+        df = df[df["qIn"] == cutIn]
+    else:
+        df = df[df["qIn"] > cutIn]
+
+    if cutOut == 0:
+        df = df[df["qOut"] == cutOut]
+    else:
+        df = df[df["qOut"] < cutOut]
+        
     return df
 
 def quota_row_full_csv(df, outGroup):
@@ -68,6 +80,8 @@ def data_manipulations(cutOff,InputCsv,listOutGroup,verbosity=1):
     statsCsv = quota_row_full_csv(IndexedCsv,listOutGroup)
 
     # evaluates if meeting criteria drop other rowa
+
+
     MeetingCriteriaCsv = drop_rows_not_meeting_criteria(statsCsv,cutOff)
 
     # output verbosity    

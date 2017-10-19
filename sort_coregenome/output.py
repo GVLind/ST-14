@@ -2,6 +2,7 @@
 
 import pandas as pd
 from Bio import SeqIO
+import os
 
 def open_proteinortho_output(myproject_fasta):    
     """	Argument: filename
@@ -29,17 +30,7 @@ def format_df(df):
 
     return formattedFrames
 
-def print_out(df, fileName = "output.txt"):
-    """ prints df to file with [fileName].csv
-    """
-    if not fileName.endswith(".csv"):
-        fileName += ".csv" 
-    
-    df.to_csv(fileName, encoding = 'utf-8', sep = "\t")
 
-    print ("printed to %s.." % (fileName))
-
-    return fileName
 
 def get_seq(df,allfasta="All.faa"):
     """ gets sequence from All.fasta using SeqIO based on the column of genes
@@ -62,7 +53,7 @@ def get_seq(df,allfasta="All.faa"):
                 seqs.append(str(rec.seq))
 
             except KeyError:
-                print ("KeyError, key not found in All.faa, printed as seq")
+                print ("KeyError, key not found in All.faa, for %s\n"%(i))
                 seqs.append("KeyError, key not found in All.faa")
 
         #handling no gene present 
@@ -78,23 +69,98 @@ def get_seq(df,allfasta="All.faa"):
     return df
 
 
-#def make_dir(outputdirname):
- #   if not os.path.exists(outputdirname):
-  #      os.makedirs(outputdirname)
+def make_dir(outputdirname):
+    """ making file if not already present
+    """
+    if not os.path.exists(outputdirname):
+        os.makedirs(outputdirname)
+    return
+
+def print_out(df, fileName = "output.txt"):
+    """ prints df to file with [fileName].csv
+    """
+    if not fileName.endswith(".csv"):
+        fileName += ".csv" 
+    
+    df.to_csv(fileName, encoding = 'utf-8', sep = "\t")
+
+    
+
+    return fileName
+
+def write_and_grab_files(fileName,df,grab=False):
+
+    # write and grab file flag
+
+    listFormattedDf= format_df(df)
+
+    for pfam in listFormattedDf:
+        filePath = fileName + pfam.name
+        printedFile = print_out(pfam, filePath)
+        print ("printed to %s.." % (filePath))        
+
+        # grab file flag
+        if grab == True:
+            openDF = open_proteinortho_output(printedFile)
+            dfSeq = get_seq(openDF)
+            filePath = fileName + pfam.name
+            print_out(dfSeq,filePath)
+            print ("appended with seq %s.." % (filePath))
+    return
+
 
 def outputmanager(df,cutOff):
     #handles output functions.
-    ans = input("grab sequences? (y/e) : " )
-    
-    if ans != "e":
+    print ("%s families meeting criteria\n" % (df.shape[0]))
 
-        listFormattedDf= format_df(df)
-        
-        
-        for i in listFormattedDf:
-            print (i)
-            fileName = print_out(i,i.name)
-            df = open_proteinortho_output(fileName)
-            if ans == "y":
-                dfSeq = get_seq(df)
-                print_out(dfSeq,fileName)
+    ans = input("Initializing output manager..\n write pfam to file? -w:\n grab sequencesans and write pfam to file? -g\n exit? -e \n: " )
+
+
+    # exit flag
+    if ans == "e":
+        raise SystemExit
+    else:
+
+
+        # case for making filenames from different kinds of settings
+        # one cutoff setting
+        if  type(cutOff[0]) != list:
+            #making single folder name
+            outFileName = "In_%s_Out_%s"%(cutOff[0],cutOff[1])
+            make_dir(outFileName)
+            path="./%s/"%(outFileName)
+
+            if ans =="g":
+
+                write_and_grab_files(path,df,True)
+
+            elif ans == "w":
+
+                write_and_grab_files(path,df,False)
+
+        # multiple cutoff settings.
+        elif  type(cutOff[0]) == list:
+
+            #making a list of foldernames   
+            outFileNames = ["In_%s_Out_%s"%(x[0],x[1]) for x in setting]
+            # making file.
+            for outFileName in outFileNames:
+                make_dir(outFileName)
+                path="./%s/"%(outFileName)
+
+            # checks what mode is selected and
+            # looping through all created filenames:
+                if ans == "w" and ans =="g":
+
+                    write_and_grab_files(path,df,True)
+
+                elif ans == "w" and not ans =="g":
+
+                    write_and_grab_files(path,df,False)
+
+        else:
+            print ("something went wrong with the settings..")
+            raise SystemExit
+
+
+
