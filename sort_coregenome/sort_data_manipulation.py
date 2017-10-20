@@ -86,6 +86,11 @@ def data_manipulations(cutOff,InputCsv,listOutGroup,verbosity=1):
 
     statsCsv = quota_row_full_csv(IndexedCsv,listOutGroup)
 
+
+    #debug for extreacting csv files
+    #statsCsv.to_csv("sample.txt", encoding = 'utf-8', sep = "\t")
+    #raise SystemExit # 
+
     # evaluates if meeting criteria drop other rowa
 
 
