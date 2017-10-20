@@ -65,11 +65,18 @@ def quota_row_full_csv(df, outGroup):
     outHits = (dfN[outGroup].sum(axis = 1))
     outTot  = (dfN[outGroup].count(axis = 1))
     
-    #adds quota to end of dataframe
-    df['hitsIn'] = inHits
-    df['qIn'] = (inHits / inTot)
-    df['hitsOut'] = outHits
-    df['qOut'] = (outHits / outTot)
+    if outGroup == []:
+        #adds quota to end of dataframe
+        df['hitsIn'] = inHits
+        df['qIn'] = (inHits / inTot)
+        df['hitsOut'] = 0
+        df['qOut'] = 0
+
+    else:
+        df['hitsIn'] = inHits
+        df['qIn'] = (inHits / inTot)
+        df['hitsOut'] = outHits
+        df['qOut'] = (outHits / outTot)
 
     return df
 
