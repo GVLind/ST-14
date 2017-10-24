@@ -16,7 +16,7 @@ def open_proteinortho_output(myproject_fasta):
 
 def format_df(df):
     """
-    Transpose and split df based on pfam, returns multiple dfs.
+    Transpose and split df based on pfam, returns list of multiple dfs.
     for output of all dfs to separate files
     """
     formattedFrames = []
@@ -30,33 +30,36 @@ def format_df(df):
 
     return formattedFrames
 
-
-
-def get_seq(df,allfasta="All.faa"):
-    """ gets sequence from All.fasta using SeqIO based on the column of genes
-        in dataframe handles misses and hits, not multiple hits.
-        offset by -4 fill with "" because no sequences for additiona
+def get_seq(df, allfasta="All.faa"):
+    """ gets sequence from All.fasta using SeqIO based on the column of gene ID
+        in dataframe. Handles misses and hits, not multiple hits.
+        offset by -4 fill with "" because no sequences for additional
         data at the end.
     """
+    # creating dict of all sequences of the investigated data.
+    # I.e. the data that have been run with proteinortho
     record_dict = SeqIO.to_dict(SeqIO.parse(allfasta, "fasta"))
     
+    # make alist of the gene IDs from data frame
     dfGenes = df["gene"].tolist()
-   
     seqs = []
 
-    #offset because family information
+    # offset -4 because family metadata at end of dataframe
     for i in dfGenes[:-4]:
         
+        # try to find exact match for each entry in record_dict
+        # if match append sequence to list seqs
+        # else output error message and continue  
         if i != "*":
             try:
-                rec=record_dict[i]
+                rec = record_dict[i]
                 seqs.append(str(rec.seq))
 
             except KeyError:
-                print ("KeyError, key not found in All.faa, for %s\n"%(i))
+                print ("KeyError, key not found in All.faa, for %s\n" % (i))
                 seqs.append("KeyError, key not found in All.faa")
 
-        #handling no gene present 
+        # handling no gene present 
         else:
             seqs.append("")
 
@@ -67,7 +70,6 @@ def get_seq(df,allfasta="All.faa"):
     df["seq"] = seqs
     
     return df
-
 
 def make_dir(outputdirname):
     """ making file if not already present
@@ -88,39 +90,48 @@ def print_out(df, fileName = "output.txt"):
 
     return fileName
 
-def write_and_grab_files(Path,df,grab=False):
+def write_and_grab_files(Path, df, grab = False):
     """ writes file using print_out function
-        for arguments: Path is expected to contain path ./Foldername/
-        df is expected to be a pandas DataFrame
-        grab is expected to be boolean.
+        arguments:
+        -Path is expected to contain path ./Foldername/
+        -df is expected to be a pandas DataFrame
+        -grab is expected to be boolean.
 
         two cases:
         1 for each line in dataframe:print file containing
-        only protein names and strains.
-        2. relies on 1, only executed if garab == True due to lack of
-        programming knowledge first the a df i opened from the file from 1
-        just printed, then the sequence is found using get_seq
+        only protein names and strains using the path + pfam from dataframe.
+        2. relies on 1, only executed if grab == True due to lack of
+        programming knowledge.
+        First the dataframe of file just printed in step case 1 is loaded,
+        then the sequences is found and appended using get_seq 
         finally new file with appended sequence overwrites the old one.
     """
     listFormattedDf= format_df(df)
 
-    # just stranin and gene
+    # 1 just stranin and gene
     for pfam in listFormattedDf:
+
         filePath = Path + pfam.name
+
         printedFile = print_out(pfam, filePath)
+
         print ("printed to %s.." % (filePath))        
 
-        # grab file flag strain, gene and seq
+        # 2 strain, gene and seq
         if grab == True:
+
             openDF = open_proteinortho_output(printedFile)
+
             dfSeq = get_seq(openDF)
+
             filePath = Path + pfam.name
-            print_out(dfSeq,filePath)
+
+            print_out(dfSeq, filePath)
+
             print ("appended with seq %s.." % (filePath))
     return
 
-
-def outputmanager(df,cutOff):
+def outputmanager(df, cutOff):
     """handles output functions.
         df is expected to be a pandas dataframe
         cutOff either a list containing cutoff for out group and in group
@@ -138,7 +149,6 @@ def outputmanager(df,cutOff):
         4. based on user input files are printed to to the path of the new
            folder
     """
-
 
     print ("%s families meeting criteria\n" % (df.shape[0]))
 
