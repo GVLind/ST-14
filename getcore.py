@@ -2,7 +2,12 @@
 """ a tool for extracting differences in pfam files from
 	output of sort_refactored:
 	
-	to get proper inpuput a composite file must be created of all .csv
+	three important remarks:
+
+	##### 1 check that the common benchmarkstrain is hardcoded ####
+	
+	##### 2 check input #####
+	 to get proper inpuput a composite file must be created of all .csv
 	files with appended sequences with the command head:
 	
 	in file with output pfam.csv:
@@ -11,8 +16,8 @@
 	where x is larger than the total amount of strains in the .csv files.
 
 	usage python3 getcore.py reference.txt query_reference.txt [r/q]
-
-	to test the output:
+	
+	#### 3 to test the output: ####
 	
 	make the first comparison file.:
 	$ python3 getcore.py allst.txt allst_ref.txt q > corequery.txt
@@ -87,7 +92,7 @@ if comparisonflag == "r":
 	benchmark = "3655.faa"
 
 elif comparisonflag == "q":
-	benchmark = "NewS1_11.faa"
+	benchmark = "11_S1.faa"
 	
 d1 = makedict_first_file(sys.argv[1], benchmark)
 d2 = makedict_second_file(sys.argv[2], benchmark)
