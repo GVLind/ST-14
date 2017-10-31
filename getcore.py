@@ -28,6 +28,9 @@
 	check that the sum is 0 when comparing number of unique + common core - single core.
 	$ a=$(cat allst_ref.txt | grep = | wc -l); b=$(cat uniqcorequery.txt | wc -l ) ; c=$(cat corequery.txt| wc -l) ;echo $a+$b-$c | bc
 	
+	### 4 when comparing files let the one with the lacking pfam be stated first. ####	
+
+
 """
 
 
