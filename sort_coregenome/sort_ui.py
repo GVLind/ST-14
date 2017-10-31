@@ -138,8 +138,8 @@ def drop_pfam(df, dropList):
     """drops columns from pandas dataframe based on input list
     """
      
-     df.drop(dropList, axis=1, inplace=True)
-     return df
+    df.drop(dropList, axis=1, inplace=True)
+    return df
 
 def set_cutoff(cutIn = 0.95, cutOut = 0.05):
     """ lets the user state the cutoffs as a number 100-0 input in pos 1 and output as pos 2.
